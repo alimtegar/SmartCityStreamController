@@ -7,20 +7,20 @@ from .dependencies import get_camera_repository
 
 router = APIRouter(prefix="/camera")
 
-@router.get("/")
-def get_all(camera_repository: CameraRepository = Depends(get_camera_repository)):
-    cameras = camera_repository.get_all()
-    return {
-        "data": [camera.dict() for camera in cameras]
-    }
-
-
 @router.post("/")
 def add(camera: CreateCamera, camera_repository: CameraRepository = Depends(get_camera_repository)):
     new_camera = camera_repository.add(camera)
     return JSONResponse(status_code=201, content={
         "data": new_camera.dict(),
     })
+
+
+@router.get("/")
+def get_all(camera_repository: CameraRepository = Depends(get_camera_repository)):
+    cameras = camera_repository.get_all()
+    return {
+        "data": [camera.dict() for camera in cameras]
+    }
 
 
 @router.get("/{id}")

@@ -23,6 +23,7 @@ def setup_event_listeners(events_emitter: EventsEmitter):
         add_stream(
             name=stream_name,
             source=event.camera.source,
+            width=event.camera.width,
         )
 
 

@@ -7,9 +7,9 @@ from app.streams.streaming import StreamingThread
 log = logging.getLogger(__name__)
 streamings: Dict[str, StreamingThread] = dict()
 
-def add_stream(name: str, source: Union[int, str]):
-    print("Adding stream:", name, source)
-    thread = StreamingThread(source, name)
+def add_stream(name: str, source: Union[int, str], width: int):
+    print("Adding stream:", name, source, width)
+    thread = StreamingThread(source, name, width)
     streamings.update({name: thread})
     thread.start()
 

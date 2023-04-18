@@ -5,6 +5,7 @@ from pydantic import BaseModel
 class CreateCamera(BaseModel):
     name: str
     source: Union[int, str]
+    width: Optional[int] = 320
 
 
 class EditCamera(BaseModel):

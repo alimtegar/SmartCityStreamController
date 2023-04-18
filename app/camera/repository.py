@@ -25,7 +25,7 @@ class CameraRepository:
         return None
 
     def add(self, data: CreateCamera) -> Camera:
-        camera = Camera(self._generate_id(), data.name, data.source)
+        camera = Camera(self._generate_id(), data.name, data.source, data.width)
         self.data.append(camera)
         self.events.emit(CameraCreated(camera))
 
