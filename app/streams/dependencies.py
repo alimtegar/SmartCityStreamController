@@ -15,12 +15,11 @@ def add_stream(name: str, source: Union[int, str], width: int, loop: bool):
 
 
 def reset_stream(name: str, source: Union[int, str], width: int, loop: bool):
-    print("Resetting stream:", name, source, width, loop)
     thread = streamings.get(name)
-
-    thread.source = source
-    thread.width = width
-    thread.loop = loop
+    if source: thread.source = source
+    if width: thread.width = width
+    if loop: thread.loop = loop
+    print("Resetting stream:", name, thread.source, thread.width, thread.loop)
 
     thread.reset()
 

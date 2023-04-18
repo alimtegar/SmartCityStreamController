@@ -33,13 +33,13 @@ class CameraRepository:
 
     def edit(self, id: int, data: EditCamera) -> Camera:
         camera = self.find(id)
-        camera.name = data.name
-        camera.source = data.source
-        camera.width = data.width
-        camera.loop = data.loop
+        if data.name: camera.name = data.name
+        if data.source: camera.source = data.source            
+        if data.width: camera.width = data.width
+        if data.loop: camera.loop = data.loop
         self.events.emit(CameraUpdated(camera))
 
-        return camera;
+        return camera
 
     def delete(self, id):
         camera = self.find(id)
