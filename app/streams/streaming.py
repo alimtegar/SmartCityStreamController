@@ -5,11 +5,12 @@ import cv2
 
 
 class StreamingThread(Thread):
-    def __init__(self, source, name, width):
+    def __init__(self, source, name, width, loop):
         Thread.__init__(self)
         self.name = name
         self.source = source
         self.width = width
+        self.loop = loop
 
         self.capture = None  # type: cv2.VideoCapture
         self.current_frame = None
@@ -27,6 +28,10 @@ class StreamingThread(Thread):
             self.capture = cv2.VideoCapture(self.source)
             while True:
                 time.sleep(0.02)
+    
+                # Loop the video
+                if self.loop and self.capture.get(cv2.CAP_PROP_POS_FRAMES) == self.capture.get(cv2.CAP_PROP_FRAME_COUNT):
+                    self.capture.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
                 if self.status == "need_restart":
                     self.status = "starting"
@@ -42,7 +47,7 @@ class StreamingThread(Thread):
                 if not success:
                     self.status = "failing"
                     time.sleep(1)
-                    frame = np.zeros((240, self.width, 3), np.uint8)
+                    frame = np.zeros((240, 320, 3), np.uint8)
                     self.current_frame = cv2.imencode('.png', frame)[1].tobytes()
 
                 else:

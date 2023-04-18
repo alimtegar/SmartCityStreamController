@@ -24,6 +24,7 @@ def setup_event_listeners(events_emitter: EventsEmitter):
             name=stream_name,
             source=event.camera.source,
             width=event.camera.width,
+            loop=event.camera.loop,
         )
 
 
@@ -35,6 +36,8 @@ def setup_event_listeners(events_emitter: EventsEmitter):
         reset_stream(
             name=f"camera-{event.camera.id}",
             source=event.camera.source,
+            width=event.camera.width,
+            loop=event.camera.loop,
         )
 
 

@@ -6,14 +6,18 @@ class CreateCamera(BaseModel):
     name: str
     source: Union[int, str]
     width: Optional[int] = 320
-
+    loop: Optional[bool] = False
 
 class EditCamera(BaseModel):
     name: Optional[str] = None
     source: Optional[Union[int, str]] = None
+    width: Optional[int] = None
+    loop: Optional[bool] = None
 
 
 class CameraResponse(BaseModel):
     id: int
     name: str
     source: Union[int, str]
+    width: int
+    loop: bool

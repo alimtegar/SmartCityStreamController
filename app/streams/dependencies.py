@@ -7,18 +7,20 @@ from app.streams.streaming import StreamingThread
 log = logging.getLogger(__name__)
 streamings: Dict[str, StreamingThread] = dict()
 
-def add_stream(name: str, source: Union[int, str], width: int):
-    print("Adding stream:", name, source, width)
-    thread = StreamingThread(source, name, width)
+def add_stream(name: str, source: Union[int, str], width: int, loop: bool):
+    print("Adding stream:", name, source, width, loop)
+    thread = StreamingThread(source, name, width, loop)
     streamings.update({name: thread})
     thread.start()
 
 
-def reset_stream(name: str, source: Union[int, str]):
-    print("Resetting stream:", name, source)
+def reset_stream(name: str, source: Union[int, str], width: int, loop: bool):
+    print("Resetting stream:", name, source, width, loop)
     thread = streamings.get(name)
 
     thread.source = source
+    thread.width = width
+    thread.loop = loop
 
     thread.reset()
 
