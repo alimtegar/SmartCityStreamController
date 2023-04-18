@@ -5,7 +5,7 @@ from app.camera.repository import CameraRepository
 from .schemas import CreateCamera, EditCamera
 from .dependencies import get_camera_repository
 
-router = APIRouter(prefix="/camera");
+router = APIRouter(prefix="/camera")
 
 @router.get("/")
 def get_all(camera_repository: CameraRepository = Depends(get_camera_repository)):

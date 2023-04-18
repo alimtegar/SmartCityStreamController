@@ -1,7 +1,9 @@
+from typing import Union
+
 class Camera(object):
     id: int
     name: str
-    source: str
+    source: Union[int, str]
 
     def __init__(self, id, name, source) -> None:
         self.id = id

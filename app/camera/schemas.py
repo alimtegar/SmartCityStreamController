@@ -1,18 +1,18 @@
-from typing import Optional
+from typing import Optional, Union
 from pydantic import BaseModel
 
 
 class CreateCamera(BaseModel):
     name: str
-    source: str
+    source: Union[int, str]
 
 
 class EditCamera(BaseModel):
     name: Optional[str] = None
-    source: Optional[str] = None
+    source: Optional[Union[int, str]] = None
 
 
 class CameraResponse(BaseModel):
     id: int
     name: str
-    source: str
+    source: Union[int, str]

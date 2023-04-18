@@ -1,5 +1,5 @@
 import logging
-from typing import Dict
+from typing import Dict, Union
 
 from app.streams.streaming import StreamingThread
 
@@ -7,14 +7,14 @@ from app.streams.streaming import StreamingThread
 log = logging.getLogger(__name__)
 streamings: Dict[str, StreamingThread] = dict()
 
-def add_stream(name: str, source: str):
+def add_stream(name: str, source: Union[int, str]):
     print("Adding stream:", name, source)
     thread = StreamingThread(source, name)
     streamings.update({name: thread})
     thread.start()
 
 
-def reset_stream(name: str, source: str):
+def reset_stream(name: str, source: Union[int, str]):
     print("Resetting stream:", name, source)
     thread = streamings.get(name)
 
