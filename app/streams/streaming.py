@@ -2,6 +2,13 @@ from threading import Thread
 import numpy as np
 import time
 import cv2
+from supervision import Detections
+
+
+from app.config import WANTED_CLASS_ID_LIST, LINE_START, LINE_END, VIDEO_PATH
+from app.models import vehicle_detection_model, plate_detection_model, text_recognition_model
+from app.utils import filter_detections, RGB, upscale_image, recognize_text, draw_counter_box
+from app.tracker import Tracker
 
 
 class StreamingThread(Thread):
@@ -18,6 +25,8 @@ class StreamingThread(Thread):
 
         self.should_stop = False
         self.should_flip = str(self.source).isnumeric()
+        
+        self.tracker = Tracker()
 
     def reset(self):
         self.status = "need_restart"
@@ -58,6 +67,30 @@ class StreamingThread(Thread):
                         frame = cv2.flip(frame, 1)
 
                     ## Assume here for Hard Processing
+                    # Detect the vehicles on the frame
+                    results = vehicle_detection_model(frame)[0]
+                    vehicle_detections = Detections.from_yolov8(results).with_nms()
+                    
+                    # Filter the detections from unwanted classes
+                    mask = np.array([class_id in WANTED_CLASS_ID_LIST for class_id in vehicle_detections.class_id], dtype=bool)
+                    vehicle_detections = filter_detections(detections=vehicle_detections, mask=mask)
+                    
+                    # Track the vehicles
+                    vehicle_detections = self.tracker.update(vehicle_detections)
+                    for xyxy, confidence, class_id, tracker_id in vehicle_detections:
+                        x1, y1, x2, y2 = xyxy.astype(np.int32)
+                        dot_xy = [int(x2), int(y2)]
+
+                        # Check if the vehicle is in `area1`
+                        # dot2area_dist = cv2.pointPolygonTest(np.array(area1, dtype=int), dot_xy, False)
+                        # is_in_area = dot2area_dist >= 0
+                        
+                        # Crop the frame with detected vehicle
+                        # vehicle_image = frame[y1:y2, x1:x2] #.copy()
+
+                        # Draw the bbox for the vehicle and draw a dot on the top-left of the bbox
+                        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                        cv2.circle(frame, dot_xy, 5, (255, 0, 255), -1)
                     
                     self.current_frame = cv2.imencode('.png', frame)[1].tobytes()
         finally:
