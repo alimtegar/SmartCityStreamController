@@ -25,6 +25,7 @@ def setup_event_listeners(events_emitter: EventsEmitter):
             source=event.camera.source,
             width=event.camera.width,
             loop=event.camera.loop,
+            counter_line=event.camera.counter_line,
         )
 
 
@@ -38,6 +39,7 @@ def setup_event_listeners(events_emitter: EventsEmitter):
             source=event.camera.source,
             width=event.camera.width,
             loop=event.camera.loop,
+            counter_line=event.camera.counter_line,
         )
 
 

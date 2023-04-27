@@ -1,7 +1,7 @@
 VEHICLE_DETECTION_MODEL_PATH = 'yolov8n.pt'
 PLATE_DETECTION_MODEL_PATH = './model_weights/plate_detection_model_nano.pt'
 TEXT_RECOGNITION_MODEL_PATH = './model_weights/text_recognition_model.pt'
-VIDEO_PATH = 'vehicle-traffic-2.webm'
+# VIDEO_PATH = 'vehicle-traffic-2.webm'
 
 # Class IDs of Interest
 WANTED_CLASS_ID_LIST = [
@@ -12,9 +12,9 @@ WANTED_CLASS_ID_LIST = [
     7, # truck
 ]
 
-# LINE_START = (540, 2210)
-LINE_START = (540, 2110)
-LINE_END = (3834, 1370)
+# LINE_START = (540, 2110)
+# LINE_END = (3834, 1370)
+COUNTER_AREA_H = 50
 
 # Text Recognition Configs
 VOCABULARY = [

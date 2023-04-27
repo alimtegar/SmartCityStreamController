@@ -6,7 +6,7 @@ from PIL import Image
 from supervision import Detections
 from torchvision import transforms
 
-from app.config import IDX2CHAR
+from app.config import IDX2CHAR, COUNTER_AREA_H
 
 def filter_detections(detections: Detections, mask: np.ndarray) -> Detections:
   return Detections(
@@ -49,6 +49,17 @@ def draw_counter_box(img, counter, res=720):
   
   cv2.rectangle(img=img, pt1=(x, y), pt2=(x+w, y+h), color=(0, 255, 0), thickness=-1)
   cv2.putText(img=img, text=f'Count: {len(counter.index):03}', org=(x+p, y+h-p), fontFace=1, fontScale=fontScale, color=(0, 0, 0), thickness=fontScale)
+
+def get_counter_area(counter_line):
+  line_start = counter_line[0]
+  line_end = counter_line[1]
+  
+  return [
+    (line_start[0], line_start[1] + COUNTER_AREA_H/2),
+    (line_end[0], line_end[1] + COUNTER_AREA_H/2),
+    (line_end[0], line_end[1] - COUNTER_AREA_H/2),
+    (line_start[0], line_start[1] - COUNTER_AREA_H/2),
+  ]
 
 # Text Recognition Utils
 def decode_text(labels):

@@ -5,19 +5,21 @@ import cv2
 from supervision import Detections
 
 
-from app.config import WANTED_CLASS_ID_LIST, LINE_START, LINE_END, VIDEO_PATH
+from app.config import WANTED_CLASS_ID_LIST
 from app.models import vehicle_detection_model, plate_detection_model, text_recognition_model
-from app.utils import filter_detections, RGB, upscale_image, recognize_text, draw_counter_box
+from app.utils import filter_detections, get_counter_area
 from app.tracker import Tracker
 
 
 class StreamingThread(Thread):
-    def __init__(self, source, name, width, loop):
+    def __init__(self, source, name, width, loop, counter_line, counter_area):
         Thread.__init__(self)
         self.name = name
         self.source = source
         self.width = width
         self.loop = loop
+        self.counter_line = counter_line
+        self.counter_area = counter_area
 
         self.capture = None  # type: cv2.VideoCapture
         self.current_frame = None
@@ -82,8 +84,8 @@ class StreamingThread(Thread):
                         dot_xy = [int(x2), int(y2)]
 
                         # Check if the vehicle is in `area1`
-                        # dot2area_dist = cv2.pointPolygonTest(np.array(area1, dtype=int), dot_xy, False)
-                        # is_in_area = dot2area_dist >= 0
+                        dot2area_dist = cv2.pointPolygonTest(np.array(self.counter_area, dtype=int), dot_xy, False)
+                        is_in_area = dot2area_dist >= 0
                         
                         # Crop the frame with detected vehicle
                         # vehicle_image = frame[y1:y2, x1:x2] #.copy()
@@ -91,6 +93,9 @@ class StreamingThread(Thread):
                         # Draw the bbox for the vehicle and draw a dot on the top-left of the bbox
                         cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                         cv2.circle(frame, dot_xy, 5, (255, 0, 255), -1)
+                    
+                    # Draw the counter area
+                    cv2.polylines(img=frame, pts=[np.array(self.counter_area, dtype=int)], isClosed=True, color=(0, 0, 255), thickness=2)
                     
                     self.current_frame = cv2.imencode('.png', frame)[1].tobytes()
         finally:
