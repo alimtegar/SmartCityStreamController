@@ -2,21 +2,23 @@ from threading import Thread
 import numpy as np
 import time
 import cv2
+import torch
+import pandas as pd
 from supervision import Detections
 
 
 from app.config import WANTED_CLASS_ID_LIST
 from app.models import vehicle_detection_model, plate_detection_model, text_recognition_model
-from app.utils import filter_detections, get_counter_area
+from app.utils import filter_detections, draw_counter, upscale_image, recognize_text
 from app.tracker import Tracker
 
 
 class StreamingThread(Thread):
-    def __init__(self, source, name, width, loop, counter_line, counter_area):
+    def __init__(self, source, name, res, loop, counter_line, counter_area):
         Thread.__init__(self)
         self.name = name
         self.source = source
-        self.width = width
+        self.res = res
         self.loop = loop
         self.counter_line = counter_line
         self.counter_area = counter_area
@@ -29,6 +31,7 @@ class StreamingThread(Thread):
         self.should_flip = str(self.source).isnumeric()
         
         self.tracker = Tracker()
+        self.counter = pd.DataFrame(columns=['tracker_id', 'plate_number'])
 
     def reset(self):
         self.status = "need_restart"
@@ -63,7 +66,7 @@ class StreamingThread(Thread):
 
                 else:
                     self.status = "running"
-                    frame = image_resize(frame, width=self.width)
+                    frame = image_resize(frame, width=self.res)
 
                     if self.should_flip:
                         frame = cv2.flip(frame, 1)
@@ -88,14 +91,40 @@ class StreamingThread(Thread):
                         is_in_area = dot2area_dist >= 0
                         
                         # Crop the frame with detected vehicle
-                        # vehicle_image = frame[y1:y2, x1:x2] #.copy()
+                        vehicle_image = frame[y1:y2, x1:x2] #.copy()
 
                         # Draw the bbox for the vehicle and draw a dot on the top-left of the bbox
-                        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                        cv2.circle(frame, dot_xy, 5, (255, 0, 255), -1)
+                        cv2.rectangle(img=frame, pt1=(x1, y1), pt2=(x2, y2), color=(0, 255, 0), thickness=1)
+                        cv2.circle(img=frame, center=dot_xy, radius=2, color=(255, 0, 255), thickness=-1)
+                        
+                        if is_in_area and not tracker_id in self.counter['tracker_id'].values:
+                            # Detect the plate of the vehicle
+                            plate_detections = plate_detection_model.predict(vehicle_image)[0]
+
+                            # Process the plate detection if any
+                            if (len(plate_detections) > 0):
+                                # Get the highest confidence plate detection
+                                max_plate_detection_boxes = plate_detections.boxes[torch.argmax(plate_detections.boxes.conf)]
+                                max_plate_detection_xyxy = max_plate_detection_boxes.xyxy[0]
+                                max_plate_detection_conf = max_plate_detection_boxes.conf[0]
+                                
+                                x1, y1, x2, y2 = map(int, max_plate_detection_xyxy[:4])
+
+                                # If plate detection confidence bigger than the threshold, show the detection
+                                PLATE_DETECTION_CONF_THRESHOLD = 0.8
+                                if max_plate_detection_conf >= PLATE_DETECTION_CONF_THRESHOLD:
+                                    plate_image = vehicle_image[y1:y2, x1:x2]
+                                    plate_image = upscale_image(img=plate_image, new_w=360)
+                                    
+                                    plate_number = recognize_text(plate_image, text_recognition_model)
+                                    
+                                    # Count the vehicles
+                                    self.counter.loc[len(self.counter.index)] = [tracker_id, plate_number] 
+                                    self.counter.drop_duplicates(subset='tracker_id', keep='last', ignore_index=True, inplace=True)
+                                    self.counter.drop_duplicates(subset='plate_number', keep='last', ignore_index=True, inplace=True)
                     
-                    # Draw the counter area
-                    cv2.polylines(img=frame, pts=[np.array(self.counter_area, dtype=int)], isClosed=True, color=(0, 0, 255), thickness=2)
+                    draw_counter(img=frame, counter=self.counter, res=self.res)
+                    cv2.polylines(img=frame, pts=[np.array(self.counter_area, dtype=int)], isClosed=True, color=(0, 0, 255), thickness=1)
                     
                     self.current_frame = cv2.imencode('.png', frame)[1].tobytes()
         finally:

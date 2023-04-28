@@ -36,7 +36,7 @@ def upscale_image(img, new_w):
 
   return upscaled_img
 
-def draw_counter_box(img, counter, res=720):
+def draw_counter(img, counter, res=720):
   resRatio = res // 720
   x = 0
   y = 0

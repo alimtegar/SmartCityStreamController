@@ -8,23 +8,23 @@ from app.utils import get_counter_area
 log = logging.getLogger(__name__)
 streamings: Dict[str, StreamingThread] = dict()
 
-def add_stream(name: str, source: Union[int, str], width: int, loop: bool, counter_line: List[Tuple[int, int]]):
-    print("Adding stream:", name, source, width, loop, counter_line)
+def add_stream(name: str, source: Union[int, str], res: int, loop: bool, counter_line: List[Tuple[int, int]]):
+    print("Adding stream:", name, source, res, loop, counter_line)
     counter_area = get_counter_area(counter_line)
-    thread = StreamingThread(source, name, width, loop, counter_line, counter_area)
+    thread = StreamingThread(source, name, res, loop, counter_line, counter_area)
     streamings.update({name: thread})
     thread.start()
 
 
-def reset_stream(name: str, source: Union[int, str], width: int, loop: bool, counter_line: List[Tuple[int, int]]):
+def reset_stream(name: str, source: Union[int, str], res: int, loop: bool, counter_line: List[Tuple[int, int]]):
     thread = streamings.get(name)
     if source: thread.source = source
-    if width: thread.width = width
+    if res: thread.res = res
     if loop: thread.loop = loop
     if counter_line: 
         thread.counter_line = counter_line
         thread.counter_area = get_counter_area(counter_line)
-    print("Resetting stream:", name, thread.source, thread.width, thread.loop, thread.counter_line)
+    print("Resetting stream:", name, thread.source, thread.res, thread.loop, thread.counter_line)
 
     thread.reset()
 

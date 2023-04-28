@@ -23,8 +23,8 @@ def add(camera: CreateCamera, camera_repository: CameraRepository = Depends(get_
 def add_with_uploaded_video(
     file: UploadFile = File(...), 
     name: str = Form(...),
-    width: Optional[int] = Form(320),
-    loop: Optional[bool] = Form(False),
+    res: Optional[int] = Form(720),
+    loop: Optional[bool] = Form(True),
     counter_line_str: Optional[str] = Form('[[0,0], [0, 0]]'),
     camera_repository: CameraRepository = Depends(get_camera_repository)
 ):
@@ -45,7 +45,7 @@ def add_with_uploaded_video(
     camera = CreateCamera(
         name=name,
         source=file_path, 
-        width=width,
+        res=res,
         loop=loop,
         counter_line=json.loads(counter_line_str),
     )

@@ -23,7 +23,7 @@ def setup_event_listeners(events_emitter: EventsEmitter):
         add_stream(
             name=stream_name,
             source=event.camera.source,
-            width=event.camera.width,
+            res=event.camera.res,
             loop=event.camera.loop,
             counter_line=event.camera.counter_line,
         )
@@ -37,7 +37,7 @@ def setup_event_listeners(events_emitter: EventsEmitter):
         reset_stream(
             name=f"camera-{event.camera.id}",
             source=event.camera.source,
-            width=event.camera.width,
+            res=event.camera.res,
             loop=event.camera.loop,
             counter_line=event.camera.counter_line,
         )

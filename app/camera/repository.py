@@ -25,7 +25,7 @@ class CameraRepository:
         return None
 
     def add(self, data: CreateCamera) -> Camera:
-        camera = Camera(self._generate_id(), data.name, data.source, data.width, data.loop, data.counter_line)
+        camera = Camera(self._generate_id(), data.name, data.source, data.res, data.loop, data.counter_line)
         self.data.append(camera)
         self.events.emit(CameraCreated(camera))
 
@@ -35,7 +35,7 @@ class CameraRepository:
         camera = self.find(id)
         if data.name: camera.name = data.name
         if data.source: camera.source = data.source            
-        if data.width: camera.width = data.width
+        if data.res: camera.res = data.res
         if data.loop: camera.loop = data.loop
         if data.counter_line: camera.counter_line = data.counter_line
         self.events.emit(CameraUpdated(camera))

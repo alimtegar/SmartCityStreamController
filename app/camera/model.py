@@ -4,15 +4,15 @@ class Camera(object):
     id: int
     name: str
     source: Union[int, str]
-    width: int
+    res: int
     loop: bool
     counter_line: List[Tuple[int, int]]
 
-    def __init__(self, id, name, source, width, loop, counter_line) -> None:
+    def __init__(self, id, name, source, res, loop, counter_line) -> None:
         self.id = id
         self.name = name
         self.source = source
-        self.width = width
+        self.res = res
         self.loop = loop
         self.counter_line = counter_line
 
@@ -21,11 +21,11 @@ class Camera(object):
             'id': self.id,
             'name': self.name,
             'source': self.source,
-            'width': self.width,
+            'res': self.res,
             'loop': self.loop,
             'counter_line': self.counter_line
         }
 
     def __copy__(self):
-        return type(self)(self.id, self.name, self.source, self.width, self.loop, self.counter_line)
+        return type(self)(self.id, self.name, self.source, self.res, self.loop, self.counter_line)
         
