@@ -5,7 +5,7 @@ metadata = MetaData()
 
 vehicles = Table(
     'vehicles', metadata,
-    Column('id', Integer, primary_key=True, index=True),
+    Column('id', String(36), primary_key=True, index=True),
     Column('vehicleType', String(255)), #Enum('Car', 'Bus', 'Motorcycle', 'Truck')),
     Column('plateNumber', String(255)),
     Column('plateCity', String(255)),

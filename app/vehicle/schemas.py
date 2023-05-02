@@ -4,7 +4,6 @@ from datetime import datetime
 from typing import List
 
 class VehicleSchema(BaseModel):
-    id: int
     timestamp: datetime
     vehicleType: str
     plateNumber: str
@@ -14,7 +13,7 @@ class VehicleSchema(BaseModel):
         orm_mode = True
 
 class Vehicle(VehicleSchema):
-    id: int
+    id: str
 
 class Vehicleslimit(BaseModel):
     limit: int = Field(default=5)
