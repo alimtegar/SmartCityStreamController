@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.streams.streaming import StreamingThread
+from app.stream.streaming import StreamingThread
 from .routes import router
 from .dependencies import add_stream, stop_all_streamings
 

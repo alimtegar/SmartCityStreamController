@@ -1,5 +1,5 @@
 from app.events import AppEvent, EventsEmitter
-from app.streams.dependencies import add_stream, remove_stream, reset_stream
+from app.stream.dependencies import add_stream, remove_stream, reset_stream
 from .model import Camera
 
 
@@ -19,7 +19,8 @@ class CameraDeleted(CameraEventPayload):
 
 def setup_event_listeners(events_emitter: EventsEmitter):
     def on_camera_created(event: CameraCreated):
-        stream_name = f"camera-{event.camera.id}"
+        # stream_name = f"camera-{event.camera.id}"
+        stream_name = event.camera.id
         add_stream(
             name=stream_name,
             source=event.camera.source,
@@ -30,12 +31,16 @@ def setup_event_listeners(events_emitter: EventsEmitter):
 
 
     def on_camera_deleted(event: CameraDeleted):
-        remove_stream(name=f"camera-{event.camera.id}")
+        # stream_name = f"camera-{event.camera.id}"
+        stream_name = event.camera.id
+        remove_stream(name=stream_name)
 
 
     def on_camera_updated(event: CameraUpdated):
+        # stream_name = f"camera-{event.camera.id}"
+        stream_name = event.camera.id
         reset_stream(
-            name=f"camera-{event.camera.id}",
+            name=stream_name,
             source=event.camera.source,
             res=event.camera.res,
             loop=event.camera.loop,

@@ -2,15 +2,15 @@ from typing import Union, List, Tuple
 
 class Camera(object):
     id: int
-    name: str
+    # name: str
     source: Union[int, str]
     res: int
     loop: bool
     counter_line: List[Tuple[int, int]]
 
-    def __init__(self, id, name, source, res, loop, counter_line) -> None:
+    def __init__(self, id, source, res, loop, counter_line) -> None:
         self.id = id
-        self.name = name
+        # self.name = name
         self.source = source
         self.res = res
         self.loop = loop
@@ -19,7 +19,7 @@ class Camera(object):
     def dict(self):
         return {
             'id': self.id,
-            'name': self.name,
+            # 'name': self.name,
             'source': self.source,
             'res': self.res,
             'loop': self.loop,
@@ -27,5 +27,5 @@ class Camera(object):
         }
 
     def __copy__(self):
-        return type(self)(self.id, self.name, self.source, self.res, self.loop, self.counter_line)
+        return type(self)(self.id, self.source, self.res, self.loop, self.counter_line)
         

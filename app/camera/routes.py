@@ -9,10 +9,10 @@ from app.camera.repository import CameraRepository
 from .schemas import CreateCamera, EditCamera
 from .dependencies import get_camera_repository
 
-router = APIRouter(prefix="/camera")
+router = APIRouter(prefix="/cameras")
 
 @router.post("/")
-def add(camera: CreateCamera, camera_repository: CameraRepository = Depends(get_camera_repository)):
+def add_camera(camera: CreateCamera, camera_repository: CameraRepository = Depends(get_camera_repository)):
     new_camera = camera_repository.add(camera)
     return JSONResponse(status_code=201, content={
         "data": new_camera.dict(),
@@ -20,9 +20,9 @@ def add(camera: CreateCamera, camera_repository: CameraRepository = Depends(get_
 
 
 @router.post("/video")
-def add_with_uploaded_video(
+def add_camera_with_uploaded_video(
     file: UploadFile = File(...), 
-    name: str = Form(...),
+    # name: str = Form(...),
     res: Optional[int] = Form(720),
     loop: Optional[bool] = Form(True),
     counter_line_str: Optional[str] = Form('[[0,0], [0, 0]]'),
@@ -43,7 +43,7 @@ def add_with_uploaded_video(
         file.file.close()
     
     camera = CreateCamera(
-        name=name,
+        # name=name,
         source=file_path, 
         res=res,
         loop=loop,
@@ -56,7 +56,7 @@ def add_with_uploaded_video(
 
 
 @router.get("/")
-def get_all(camera_repository: CameraRepository = Depends(get_camera_repository)):
+def get_cameras(camera_repository: CameraRepository = Depends(get_camera_repository)):
     cameras = camera_repository.get_all()
     return {
         "data": [camera.dict() for camera in cameras]
@@ -64,7 +64,7 @@ def get_all(camera_repository: CameraRepository = Depends(get_camera_repository)
 
 
 @router.get("/{id}")
-def get(id: int, camera_repository: CameraRepository = Depends(get_camera_repository)):
+def get_camera(id: int, camera_repository: CameraRepository = Depends(get_camera_repository)):
     camera = camera_repository.find(id)
     return {
         "data": camera.dict(),
@@ -72,12 +72,12 @@ def get(id: int, camera_repository: CameraRepository = Depends(get_camera_reposi
 
 
 @router.put("/{id}")
-def edit(id: int, camera: EditCamera, camera_repository: CameraRepository = Depends(get_camera_repository)):
+def edit_camera(id: int, camera: EditCamera, camera_repository: CameraRepository = Depends(get_camera_repository)):
     camera = camera_repository.edit(id, camera)
     return {"data": camera.dict()}
 
 
 @router.delete("/{id}")
-def delete(id: int, camera_repository: CameraRepository = Depends(get_camera_repository)):
+def delete_camera(id: int, camera_repository: CameraRepository = Depends(get_camera_repository)):
     camera_repository.delete(id)
     return JSONResponse(status_code=204)
