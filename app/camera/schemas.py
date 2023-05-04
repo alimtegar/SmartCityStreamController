@@ -7,7 +7,7 @@ class CreateCamera(BaseModel):
     source: Union[int, str]
     res: Optional[int] = 720
     loop: Optional[bool] = True
-    counter_line: Optional[List[Tuple[int, int]]] = [(0,0), (0, 0)]
+    counter_line: Optional[List[Tuple[int, int]]] = [(0,300), (720, 300)]
 
 class EditCamera(BaseModel):
     # name: Optional[str] = None

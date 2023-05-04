@@ -4,13 +4,17 @@ import time
 import cv2
 import torch
 import pandas as pd
+from datetime import datetime
 from supervision import Detections
 import mysql.connector
 
-from app.config import WANTED_CLASS_ID_LIST, DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME, DB_PORT, DB_SOCKET
+
+from app.config import WANTED_CLASS_ID_LIST, CLASS_NAME_MAP
 from app.models import vehicle_detection_model, plate_detection_model, text_recognition_model
-from app.utils import filter_detections, draw_counter, upscale_image, recognize_text
+from app.utils import filter_detections, draw_counter, upscale_image, recognize_text, get_plate_city
 from app.tracker import Tracker
+from app.vehicle.schemas import VehicleSchema
+from app.vehicle.dependencies import add_vehicle_to_db
 
 license_none = {
     'none': 'Unknown city code'
@@ -195,6 +199,15 @@ class StreamingThread(Thread):
                                         
                                         # Recognize the text of the plate number
                                         plate_number = recognize_text(plate_image, text_recognition_model)
+                                        
+                                        # Add vehicle to DB
+                                        vehicle = VehicleSchema(
+                                            timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                            vehicleType=CLASS_NAME_MAP[class_id],
+                                            plateNumber=plate_number,
+                                            plateCity=get_plate_city(plate_number),
+                                        )
+                                        add_vehicle_to_db(vehicle)
                                         
                                         # Count the vehicles
                                         self.counter.loc[len(self.counter.index)] = [tracker_id, plate_number] 
