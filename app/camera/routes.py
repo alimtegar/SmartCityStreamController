@@ -25,7 +25,7 @@ def add_camera_with_uploaded_video(
     # name: str = Form(...),
     res: Optional[int] = Form(720),
     loop: Optional[bool] = Form(True),
-    counter_line_str: Optional[str] = Form('[[0,0], [0, 0]]'),
+    counter_line_str: Optional[str] = Form('[[0,300], [720, 300]]'),
     camera_repository: CameraRepository = Depends(get_camera_repository)
 ):
     try:

@@ -1,3 +1,4 @@
+import re
 import numpy as np
 import cv2
 import torch
@@ -6,7 +7,7 @@ from PIL import Image
 from supervision import Detections
 from torchvision import transforms
 
-from app.config import IDX2CHAR, COUNTER_AREA_H
+from app.config import IDX2CHAR, COUNTER_AREA_H, PLATE_CITY_MAP
 
 def filter_detections(detections: Detections, mask: np.ndarray) -> Detections:
   return Detections(
@@ -106,3 +107,8 @@ def recognize_text(np_image: np.ndarray, model):
     recognized_text = correct_text(recognized_text[0])
 
   return recognized_text
+
+def get_plate_city(plate_number: str):
+  plate_city_code = re.match(r'[A-Za-z]{1,2}', plate_number).group()
+  plate_city = PLATE_CITY_MAP[plate_city_code]
+  return plate_city
