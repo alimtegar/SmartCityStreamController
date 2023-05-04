@@ -20,6 +20,8 @@ CLASS_NAME_MAP = {
     7: 'truck',
 }
 
+CLASS_NAMES = list(CLASS_NAME_MAP.values())
+
 PLATE_CITY_MAP = {
     'AA': 'Purworejo, Temanggung, Magelang, Wonosobo, kebumen, Kedu',
     'AD': 'Surakarta, Boyolali, Wonogiri, Sukoharjo, Karanganyar, Sragen, Klaten',

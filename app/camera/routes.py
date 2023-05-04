@@ -2,7 +2,7 @@ import os
 import time
 import json
 from typing import Optional
-from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException
+from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, Request
 from fastapi.responses import JSONResponse
 
 from app.camera.repository import CameraRepository
@@ -21,12 +21,13 @@ def add_camera(camera: CreateCamera, camera_repository: CameraRepository = Depen
 
 @router.post("/video")
 def add_camera_with_uploaded_video(
+    # request: Request,
     file: UploadFile = File(...), 
     # name: str = Form(...),
     res: Optional[int] = Form(720),
     loop: Optional[bool] = Form(True),
-    counter_line_str: Optional[str] = Form('[[0,300], [720, 300]]'),
-    camera_repository: CameraRepository = Depends(get_camera_repository)
+    counter_line_str: Optional[str] = Form('[[0,288], [720, 288]]'),
+    camera_repository: CameraRepository = Depends(get_camera_repository),
 ):
     try:
         contents = file.file.read()
@@ -52,6 +53,7 @@ def add_camera_with_uploaded_video(
     new_camera = camera_repository.add(camera)
     return JSONResponse(status_code=201, content={
         "data": new_camera.dict(),
+        # "streaming_url": f'{request.url.scheme}://{request.client.host}:{request.url.port}/streams/{new_camera.id}',
     })
 
 

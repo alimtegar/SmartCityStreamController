@@ -70,6 +70,7 @@ vehicle_detection_model = YOLO(VEHICLE_DETECTION_MODEL_PATH)
 vehicle_detection_model.fuse()
 
 plate_detection_model = YOLO(PLATE_DETECTION_MODEL_PATH)
+plate_detection_model.fuse()
 
 text_recognition_model = CRNN(num_chars=len(VOCABULARY))
 text_recognition_model.load_state_dict(torch.load(TEXT_RECOGNITION_MODEL_PATH, map_location=torch.device('cpu')))
