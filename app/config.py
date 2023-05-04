@@ -5,7 +5,7 @@ TEXT_RECOGNITION_MODEL_PATH = './model_weights/text_recognition_model.pt'
 
 # Class IDs of Interest
 WANTED_CLASS_ID_LIST = [
-    1, # bicycle
+    # 1, # bicycle
     2, # car
     3, # motorcycle
     5, # bus
@@ -84,11 +84,11 @@ PLATE_CITY_MAP = {
 
 # LINE_START = (540, 2110)
 # LINE_END = (3834, 1370)
-COUNTER_AREA_H = 20
+COUNTER_AREA_H = 340
 
 # Text Recognition Config
 VOCABULARY = [
-    '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+    '-', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
     'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
     'W', 'X', 'Y', 'Z'

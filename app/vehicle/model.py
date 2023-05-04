@@ -5,9 +5,10 @@ metadata = MetaData()
 
 vehicles = Table(
     'vehicles', metadata,
-    Column('id', String(36), primary_key=True, index=True),
+    Column('id', String(38), primary_key=True, index=True),
     Column('vehicleType', String(255)), #Enum('Car', 'Bus', 'Motorcycle', 'Truck')),
     Column('plateNumber', String(255), index=True),
     Column('plateCity', String(255)),
+    Column('stream_id', Integer),
     Column('timestamp', DateTime()),
 )
