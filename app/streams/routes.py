@@ -35,6 +35,9 @@ def show(name: str, fps: int = 15):
         <head><title>Streaming</title></head>
         <body>
             <img width="1024" src="/streams/{name}/stream?fps={fps}" />
+            <form action="/vehicles" target="_blank" method="post">
+                <input type="submit" value="Data Monitoring">
+            </form>
         </body>
     </html>
     """

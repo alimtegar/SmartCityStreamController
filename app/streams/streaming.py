@@ -5,13 +5,89 @@ import cv2
 import torch
 import pandas as pd
 from supervision import Detections
+import mysql.connector
 
-
-from app.config import WANTED_CLASS_ID_LIST
+from app.config import WANTED_CLASS_ID_LIST, DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME, DB_PORT, DB_SOCKET
 from app.models import vehicle_detection_model, plate_detection_model, text_recognition_model
 from app.utils import filter_detections, draw_counter, upscale_image, recognize_text
 from app.tracker import Tracker
 
+license_none = {
+    'none': 'Unknown city code'
+}
+license_plate_city = {
+    'AA': 'Purworejo, Temanggung, Magelang, Wonosobo, kebumen, Kedu',
+    'AD': 'Surakarta, Boyolali, Wonogiri, Sukoharjo, Karanganyar, Sragen, Klaten',
+    'K': 'Pati, Kudus, Cepu, Jepara, Grobogan, Rembang, Blora',
+    'AA': 'Purworejo, Temanggung, Magelang, Wonosobo, kebumen, Kedu',
+    'AD': 'Surakarta, Boyolali, Wonogiri, Sukoharjo, Karanganyar, Sragen, Klaten',
+    'K': 'Pati, Kudus, Cepu, Jepara, Grobogan, Rembang, Blora',
+    'R': 'Banjarnegara, Banyumas, Cilacap, Purbalingga',
+    'G': 'Brebes, Pemalang, Batang, Tegal, Pekalongan',
+    'H': 'Semarang, Salatiga, Kendal, Demak','AB': 'Yogyakarta',
+    'D': 'Bandung, Cimahi',
+    'F': 'Bogor, Sukabumi, Cianjur',
+    'E': 'Kuningan, Cirebon, Majalengka, Indramayu',
+    'Z': 'Banjar, Garut, Ciamis, Tasikmalaya, Sumedang',
+    'T': 'Subang, Purwakarta, Karawang',
+    'A': 'Banten, Tangerang, Cilegon, Lebak, Serang, Pandeglang',
+    'B': 'DKI Jakarta, Bekasi, Depok',
+    'AG': 'Tulungagung, Kediri, Blitar, Trenggalek, Nganjuk',
+    'AE': 'Ngawi, Madiun, Pacitan, Ponorogo, Magetan',
+    'L': 'Jawa timur, Surabaya',
+    'M': 'Madura, Bangkalan, Sampang, Sumenep, Pamekasan',
+    'N': 'Malang, Pasuruan, Probolinggo, Batu, Lumajang',
+    'S': 'Jombang, Bojonegoro, Lamongan, Mojokerto',
+    'W': 'Gresik, Sidoarjo',
+    'P': 'Banyuwangi, Besuki, Bondowoso, Jember, situbondo',
+    'DK': 'Bali',
+    'ED': 'Sumba Timur',
+    'EA': 'Sumbawa, Bima, Dompu',
+    'EB': 'Nusa Tenggara, Flores',
+    'DH': 'Kupang, Rote Ndao, Timor',
+    'DR': 'Lombok, Mataram',
+    'KU': 'Kalimantan Utara',
+    'KT': 'Kalimantan Timur',
+    'DA': 'Kalimantan Selatan',
+    'KB': 'Kalimantan Barat',
+    'KH': 'Kalimantan Tengah',
+    'DC': 'Sulawesi Barat',
+    'DD': 'Sulawesi selatan',
+    'DN': 'Sulawesi Tengah',
+    'DT': 'Sulawesi Tenggara',
+    'DL': 'Sitaro, Talaud, Sangihe',
+    'DM': 'Gorontalo',
+    'DB': 'Manado, Minahasa, Tomohon, Bolaang Mongondow',
+    'BA': 'Sumatera Barat',
+    'BB': 'Sumatera Utara bagian barat',
+    'BD': 'Bengkulu',
+    'BE': 'Lampung',
+    'BG': 'Sumatera Selatan bagian timur',
+    'BH': 'Jambi',
+    'BK': 'Sumatera Utara',
+    'BL': 'Aceh',
+    'BM': 'Riau',
+    'BN': 'Bangka Belitung',
+    'BP': 'Kepulauan Riau',
+    'DE': 'Maluku',
+    'DG': 'Mauku Utara',
+    'PA': 'Papua',
+    'PB': 'Papua Barat',
+}
+
+db1 = mysql.connector.connect(
+    host=DB_HOST,
+    user=DB_USERNAME,
+    passwd=DB_PASSWORD,
+    database=DB_NAME,
+    port=DB_PORT,
+    unix_socket=DB_SOCKET,
+)
+
+def listToString(s):
+    string = ""
+    for st in s: string += st
+    return string
 
 class StreamingThread(Thread):
     def __init__(self, source, name, res, loop, counter_line, counter_area):
@@ -117,6 +193,18 @@ class StreamingThread(Thread):
                                     plate_image = upscale_image(img=plate_image, new_w=360)
                                     
                                     plate_number = recognize_text(plate_image, text_recognition_model)
+                                    
+                                    cursor = db1.cursor(buffered=True)
+                                    query = "INSERT INTO vehicles (id, vehicleType, plateNumber, plateCity, stream_id, timestamp) VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP())"
+                                    
+                                    plate_city = list(map(str, plate_number))
+                                    citycode = plate_city[0:1] if len(plate_city)<=7 else plate_city[0:1]
+                                    city = license_plate_city[listToString(citycode)] if listToString(citycode) in license_plate_city else license_none['none']
+
+                                    val = (int(tracker_id), results.names[class_id], plate_number, city, 1)
+                                    cursor.execute(query, val)
+
+                                    db1.commit()
                                     
                                     # Count the vehicles
                                     self.counter.loc[len(self.counter.index)] = [tracker_id, plate_number] 

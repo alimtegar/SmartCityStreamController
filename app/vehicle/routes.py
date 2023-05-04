@@ -1,26 +1,28 @@
 # Counting berdasarkan waktu, jenis kendaraan, kota dari plat
 
-import uuid
+# import uuid
 from typing import Optional
 from fastapi import APIRouter, Response, status
-from sqlalchemy import and_
+from fastapi.responses import HTMLResponse
+from sqlalchemy import or_, and_
 from datetime import datetime
-# import mysql.connector
+import mysql.connector
 
 from app.database import conn, SessionLocal
 # from app.config import DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME, DB_PORT, DB_SOCKET
 from .model import vehicles
-from .schemas import VehicleSchema, Vehicleslimit
+# from .schemas import VehicleSchema
+# from app.streams.streaming import StreamingThread
 
 router = APIRouter()
 
 # db1 = mysql.connector.connect(
-#   host=DB_HOST,
-#   user=DB_USERNAME,
-#   passwd=DB_PASSWORD,
-#   database=DB_NAME,
-#   port=DB_PORT,
-#   unix_socket=DB_SOCKET,
+#     host=DB_HOST,
+#     user=DB_USERNAME,
+#     passwd=DB_PASSWORD,
+#     database=DB_NAME,
+#     port=DB_PORT,
+#     unix_socket=DB_SOCKET,
 # )
 
 session = SessionLocal()
@@ -29,24 +31,29 @@ session = SessionLocal()
 async def read_vehicles(response: Response, stream_id: Optional[int] = None,
                         time_start: Optional[datetime] = None, time_end: Optional[datetime] = None,
                         type: Optional[str] = None,
-                        city: Optional[str] = None,):
-    # time_start = '2023-05-02 10:07:57'
-    # time_end = '2023-05-02 10:23:36'
+                        city: Optional[str] = None):
+    
     print("Stream ID : ", stream_id)
 
+    response_title = 'All Data'
+    length = 0
     # Read Data by Stream ID 
     if stream_id is not None:
         # Filter Data by Time, time and type, time and city, and triple each Stream ID
         if time_start is not None and time_end is not None:
             if type is not None and city is None:
                 query = vehicles.select().where(and_(vehicles.c.stream_id==stream_id, and_(vehicles.c.timestamp>=time_start, vehicles.c.timestamp<=time_end), vehicles.c.vehicleType == type))
+                response_title = 'Count by TIME and TYPE in each stream ID'
             elif type is None and city is not None:
-                query = vehicles.select().where(and_(vehicles.c.stream_id==stream_id, and_(vehicles.c.timestamp>=time_start, vehicles.c.timestamp<=time_end), vehicles.c.plateCity == city))
+                query = vehicles.select().where(and_(vehicles.c.stream_id==stream_id, and_(vehicles.c.timestamp>=time_start, vehicles.c.timestamp<=time_end), vehicles.c.plateCity.contains(city)))
+                response_title = 'Count by TIME and CITY in each stream ID'
             elif type is not None and city is not None:
-                query = vehicles.select().where(and_(vehicles.c.stream_id==stream_id, and_(vehicles.c.timestamp>=time_start, vehicles.c.timestamp<=time_end), vehicles.c.plateCity == city, vehicles.c.vehicleType == type))
+                query = vehicles.select().where(and_(vehicles.c.stream_id==stream_id, and_(vehicles.c.timestamp>=time_start, vehicles.c.timestamp<=time_end), vehicles.c.plateCity.contains(city), vehicles.c.vehicleType == type))
+                response_title = 'Count by TIME, CITY, and TYPE in each stream ID'
             else:
                 query = vehicles.select().where(and_(vehicles.c.stream_id==stream_id, and_(vehicles.c.timestamp>=time_start, vehicles.c.timestamp<=time_end)))
-            
+                response_title = 'Count by TIME in each stream ID'
+
             data = conn.execute(query)
 
             result_dict = [u._asdict() for u in data.fetchall()]
@@ -56,9 +63,11 @@ async def read_vehicles(response: Response, stream_id: Optional[int] = None,
         # Filter Data by Type and type & city each Stream ID
         elif type is not None:
             if city is not None:
-                query = vehicles.select().where(and_(vehicles.c.stream_id==stream_id, vehicles.c.plateCity == city, vehicles.c.vehicleType == type))
+                query = vehicles.select().where(and_(vehicles.c.stream_id==stream_id, vehicles.c.plateCity.contains(city), vehicles.c.vehicleType == type))
+                response_title = 'Count by TYPE and CITY in each stream ID'
             else:
                 query = vehicles.select().where(and_(vehicles.c.stream_id==stream_id, vehicles.c.vehicleType == type))
+                response_title = 'Count by TYPE in each stream ID'
             data = conn.execute(query)
 
             result_dict = [u._asdict() for u in data.fetchall()]
@@ -67,11 +76,12 @@ async def read_vehicles(response: Response, stream_id: Optional[int] = None,
         
         # Filter Data by City each Stream ID
         elif city is not None:
-            query = vehicles.select().where(and_(vehicles.c.stream_id==stream_id, vehicles.c.plateCity == city))
+            query = vehicles.select().where(and_(vehicles.c.stream_id==stream_id, vehicles.c.plateCity.contains(city)))
             data = conn.execute(query)
 
             result_dict = [u._asdict() for u in data.fetchall()]
             length = len(result_dict)
+            response_title = 'Count by CITY in each stream ID'
             response = {"message": f"success filter data ", "count": length, "data": result_dict}
         
         else:
@@ -80,21 +90,26 @@ async def read_vehicles(response: Response, stream_id: Optional[int] = None,
 
             result_dict = [u._asdict() for u in data.fetchall()]
             length = len(result_dict)
+            response_title = 'Count by stream ID'
             response = {"message": f"success get data ", "count": length, "data": result_dict }
         
-        return response if length !=0 else {"message": f"data not found"}
+        # return response if length !=0 else {"message": f"data not found"}
 
     # Filter Data by Time 
     if time_start is not None and time_end is not None:
         if type is not None and city is None:
             query = vehicles.select().where(and_(and_(vehicles.c.timestamp>=time_start, vehicles.c.timestamp<=time_end), vehicles.c.vehicleType == type))
+            response_title = 'Count by TIME and TYPE'
         elif type is None and city is not None:
-            query = vehicles.select().where(and_(and_(vehicles.c.timestamp>=time_start, vehicles.c.timestamp<=time_end), vehicles.c.plateCity == city))
+            query = vehicles.select().where(and_(and_(vehicles.c.timestamp>=time_start, vehicles.c.timestamp<=time_end), vehicles.c.plateCity.contains(city)))
+            response_title = 'Count by TIME and CITY'
         elif type is not None and city is not None:
-            query = vehicles.select().where(and_(and_(vehicles.c.timestamp>=time_start, vehicles.c.timestamp<=time_end), vehicles.c.plateCity == city, vehicles.c.vehicleType == type))
+            query = vehicles.select().where(and_(and_(vehicles.c.timestamp>=time_start, vehicles.c.timestamp<=time_end), vehicles.c.plateCity.contains(city), vehicles.c.vehicleType == type))
+            response_title = 'Count by TIME, CITY, and TYPE'
         else:
             query = vehicles.select().where(and_(vehicles.c.timestamp>=time_start, vehicles.c.timestamp<=time_end))
-        
+            response_title = 'Count by TIME'
+
         data = conn.execute(query)
 
         result_dict = [u._asdict() for u in data.fetchall()]
@@ -104,9 +119,11 @@ async def read_vehicles(response: Response, stream_id: Optional[int] = None,
     # Filter Data by Type
     elif type is not None:
         if city is not None:
-            query = vehicles.select().where(vehicles.c.plateCity == city)
+            query = vehicles.select().where(and_(vehicles.c.vehicleType == type, vehicles.c.plateCity.contains(city)))
+            response_title = 'Count by TYPE and CITY'
         else:
             query = vehicles.select().where(vehicles.c.vehicleType == type)
+            response_title = 'Count by TYPE'
         
         data = conn.execute(query)
 
@@ -116,11 +133,12 @@ async def read_vehicles(response: Response, stream_id: Optional[int] = None,
         
     # Filter Data by City
     elif city is not None:
-        query = vehicles.select().where(vehicles.c.plateCity == city)
+        query = vehicles.select().where(vehicles.c.plateCity.contains(city))
         data = conn.execute(query)
 
         result_dict = [u._asdict() for u in data.fetchall()]
         length = len(result_dict)
+        response_title = 'Count by CITY'
         response = {"message": f"success filter data ", "count": length, "data": result_dict}
 
     else:
@@ -128,9 +146,24 @@ async def read_vehicles(response: Response, stream_id: Optional[int] = None,
         data = conn.execute(query)
 
         result_dict = [u._asdict() for u in data.fetchall()]
+        response_title = 'Count All Vehicles'
         response = {"message": f"success read data", "data": result_dict}
     
-    return response if length !=0 else {"message": f"data not found"}
+    # return response if length !=0 else {"message": f"data not found"}
+
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+        <head><title>Data Monitoring</title></head>
+        <body>
+            <h2>{response_title}</h2
+            <h3>
+                <strong>{length}</strong> vehicles counted.
+            </h3>
+        </body>
+    </html>
+    """
+    return HTMLResponse(content=html, status_code=200) 
 
 @router.get("/vehicles/{id}", name="Read Vehicle By ID", description="Show the detail of each data")
 async def read_vehicle(id: int, response: Response):
@@ -144,24 +177,24 @@ async def read_vehicle(id: int, response: Response):
     response = {"message": f"success fetching data by id {id}", "data": data }
     return response
 
-@router.post('/vehicles', description="Add new vehicle")
-async def insert_vehicle(vehicle : VehicleSchema):
-    try:
-        # Generate a UUID for the new vehicle record
-        vehicle_id = str(uuid.uuid4())
+# @router.post('/vehicles', description="Add new vehicle")
+# async def insert_vehicle(vehicle : VehicleSchema):
+#     try:
+#         # Generate a UUID for the new vehicle record
+#         vehicle_id = str(uuid.uuid4())
         
-        # Add the UUID to the vehicle data
-        vehicle_dict = dict(vehicle)
-        vehicle_dict['id'] = vehicle_id
+#         # Add the UUID to the vehicle data
+#         vehicle_dict = dict(vehicle)
+#         vehicle_dict['id'] = vehicle_id
         
-        # Insert the new vehicle record into the database
-        stmt = vehicles.insert().values(**vehicle_dict)
-        session.execute(stmt)
+#         # Insert the new vehicle record into the database
+#         stmt = vehicles.insert().values(**vehicle_dict)
+#         session.execute(stmt)
 
-        response = {"message": f"data successfully added", "data": vehicle_dict}
-    except Exception as e:
-        response = {"message": f"an error occurred: {str(e)}"}
-    finally:
-        session.close()
+#         response = {"message": f"data successfully added", "data": vehicle_dict}
+#     except Exception as e:
+#         response = {"message": f"an error occurred: {str(e)}"}
+#     finally:
+#         session.close()
 
-    return response
+#     return response
