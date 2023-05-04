@@ -1,34 +1,20 @@
-# Counting berdasarkan waktu, jenis kendaraan, kota dari plat
-
-# import uuid
+import uuid
 from typing import Optional
 from fastapi import APIRouter, Response, status
 from fastapi.responses import HTMLResponse
 from sqlalchemy import or_, and_
 from datetime import datetime
-import mysql.connector
 
 from app.database import conn, SessionLocal
-# from app.config import DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME, DB_PORT, DB_SOCKET
 from .model import vehicles
-# from .schemas import VehicleSchema
-# from app.streams.streaming import StreamingThread
+from .schemas import VehicleSchema
 
-router = APIRouter()
-
-# db1 = mysql.connector.connect(
-#     host=DB_HOST,
-#     user=DB_USERNAME,
-#     passwd=DB_PASSWORD,
-#     database=DB_NAME,
-#     port=DB_PORT,
-#     unix_socket=DB_SOCKET,
-# )
+router = APIRouter(prefix="/vehicles")
 
 session = SessionLocal()
 
-@router.get("/vehicles", description="Read vehicles data")
-async def read_vehicles(response: Response, stream_id: Optional[int] = None,
+@router.get("/", description="Get the details of all vehicles")
+async def get_vehicles(response: Response, stream_id: Optional[int] = None,
                         time_start: Optional[datetime] = None, time_end: Optional[datetime] = None,
                         type: Optional[str] = None,
                         city: Optional[str] = None):
@@ -165,10 +151,9 @@ async def read_vehicles(response: Response, stream_id: Optional[int] = None,
     """
     return HTMLResponse(content=html, status_code=200) 
 
-@router.get("/vehicles/{id}", name="Read Vehicle By ID", description="Show the detail of each data")
-async def read_vehicle(id: int, response: Response):
+@router.get("/{id}", description="Get the detail of a single vehicle.")
+async def get_vehicle(id: int, response: Response):
     query = vehicles.select().where(vehicles.c.id == id)
-    # print(vehicles.c)
     data = conn.execute(query).fetchone()._asdict()
     if data is None:
         response.status_code = status.HTTP_404_NOT_FOUND
@@ -177,24 +162,27 @@ async def read_vehicle(id: int, response: Response):
     response = {"message": f"success fetching data by id {id}", "data": data }
     return response
 
-# @router.post('/vehicles', description="Add new vehicle")
-# async def insert_vehicle(vehicle : VehicleSchema):
-#     try:
-#         # Generate a UUID for the new vehicle record
-#         vehicle_id = str(uuid.uuid4())
+@router.post('/', description="Add new vehicle.")
+async def add_vehicle(vehicle : VehicleSchema):
+    try:
+        # Generate a UUID for the new vehicle record
+        vehicle_id = str(uuid.uuid4())
         
-#         # Add the UUID to the vehicle data
-#         vehicle_dict = dict(vehicle)
-#         vehicle_dict['id'] = vehicle_id
+        # Add the UUID to the vehicle data
+        vehicle_dict = dict(vehicle)
+        vehicle_dict['id'] = vehicle_id
         
-#         # Insert the new vehicle record into the database
-#         stmt = vehicles.insert().values(**vehicle_dict)
-#         session.execute(stmt)
+        # Insert the new vehicle record into the database
+        stmt = vehicles.insert().values(**vehicle_dict)
+        session.execute(stmt)
 
-#         response = {"message": f"data successfully added", "data": vehicle_dict}
-#     except Exception as e:
-#         response = {"message": f"an error occurred: {str(e)}"}
-#     finally:
-#         session.close()
+        response = {
+            "message": f"Vehicle added successfully.", 
+            "data": vehicle_dict
+        }
+    except Exception as e:
+        response = {"message": f"an error occurred: {str(e)}"}
+    finally:
+        session.close()
 
-#     return response
+    return response

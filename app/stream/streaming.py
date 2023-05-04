@@ -156,60 +156,50 @@ class StreamingThread(Thread):
                     mask = np.array([class_id in WANTED_CLASS_ID_LIST for class_id in vehicle_detections.class_id], dtype=bool)
                     vehicle_detections = filter_detections(detections=vehicle_detections, mask=mask)
                     
-                    # Track the vehicles
-                    vehicle_detections = self.tracker.update(vehicle_detections)
-                    for xyxy, confidence, class_id, tracker_id in vehicle_detections:
-                        x1, y1, x2, y2 = xyxy.astype(np.int32)
-                        dot_xy = [int(x2), int(y2)]
+                    if len(vehicle_detections):
+                        # Track the vehicles
+                        vehicle_detections = self.tracker.update(vehicle_detections)
+                        for xyxy, confidence, class_id, tracker_id in vehicle_detections:
+                            x1, y1, x2, y2 = xyxy.astype(np.int32)
+                            dot_xy = [int(x2), int(y2)]
 
-                        # Check if the vehicle is in `area1`
-                        dot2area_dist = cv2.pointPolygonTest(np.array(self.counter_area, dtype=int), dot_xy, False)
-                        is_in_area = dot2area_dist >= 0
-                        
-                        # Crop the frame with detected vehicle
-                        vehicle_image = frame[y1:y2, x1:x2] #.copy()
+                            # Check if the vehicle is in `area1`
+                            dot2area_dist = cv2.pointPolygonTest(np.array(self.counter_area, dtype=int), dot_xy, False)
+                            is_in_area = dot2area_dist >= 0
+                            
+                            # Crop the frame with detected vehicle
+                            vehicle_image = frame[y1:y2, x1:x2] #.copy()
 
-                        # Draw the bbox for the vehicle and draw a dot on the top-left of the bbox
-                        cv2.rectangle(img=frame, pt1=(x1, y1), pt2=(x2, y2), color=(0, 255, 0), thickness=1)
-                        cv2.circle(img=frame, center=dot_xy, radius=2, color=(255, 0, 255), thickness=-1)
-                        
-                        if is_in_area and not tracker_id in self.counter['tracker_id'].values:
-                            # Detect the plate of the vehicle
-                            plate_detections = plate_detection_model.predict(vehicle_image)[0]
+                            # Draw the bbox for the vehicle and draw a dot on the top-left of the bbox
+                            cv2.rectangle(img=frame, pt1=(x1, y1), pt2=(x2, y2), color=(0, 255, 0), thickness=1)
+                            cv2.circle(img=frame, center=dot_xy, radius=2, color=(255, 0, 255), thickness=-1)
+                            
+                            if is_in_area and not tracker_id in self.counter['tracker_id'].values:
+                                # Detect the plate of the vehicle
+                                plate_detections = plate_detection_model.predict(vehicle_image)[0]
 
-                            # Process the plate detection if any
-                            if (len(plate_detections) > 0):
-                                # Get the highest confidence plate detection
-                                max_plate_detection_boxes = plate_detections.boxes[torch.argmax(plate_detections.boxes.conf)]
-                                max_plate_detection_xyxy = max_plate_detection_boxes.xyxy[0]
-                                max_plate_detection_conf = max_plate_detection_boxes.conf[0]
-                                
-                                x1, y1, x2, y2 = map(int, max_plate_detection_xyxy[:4])
-
-                                # If plate detection confidence bigger than the threshold, show the detection
-                                PLATE_DETECTION_CONF_THRESHOLD = 0.8
-                                if max_plate_detection_conf >= PLATE_DETECTION_CONF_THRESHOLD:
-                                    plate_image = vehicle_image[y1:y2, x1:x2]
-                                    plate_image = upscale_image(img=plate_image, new_w=360)
+                                # Process the plate detection if any
+                                if (len(plate_detections) > 0):
+                                    # Get the highest confidence plate detection
+                                    max_plate_detection_boxes = plate_detections.boxes[torch.argmax(plate_detections.boxes.conf)]
+                                    max_plate_detection_xyxy = max_plate_detection_boxes.xyxy[0]
+                                    max_plate_detection_conf = max_plate_detection_boxes.conf[0]
                                     
-                                    plate_number = recognize_text(plate_image, text_recognition_model)
-                                    
-                                    cursor = db1.cursor(buffered=True)
-                                    query = "INSERT INTO vehicles (id, vehicleType, plateNumber, plateCity, stream_id, timestamp) VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP())"
-                                    
-                                    plate_city = list(map(str, plate_number))
-                                    citycode = plate_city[0:1] if len(plate_city)<=7 else plate_city[0:1]
-                                    city = license_plate_city[listToString(citycode)] if listToString(citycode) in license_plate_city else license_none['none']
+                                    x1, y1, x2, y2 = map(int, max_plate_detection_xyxy[:4])
 
-                                    val = (int(tracker_id), results.names[class_id], plate_number, city, 1)
-                                    cursor.execute(query, val)
-
-                                    db1.commit()
-                                    
-                                    # Count the vehicles
-                                    self.counter.loc[len(self.counter.index)] = [tracker_id, plate_number] 
-                                    self.counter.drop_duplicates(subset='tracker_id', keep='last', ignore_index=True, inplace=True)
-                                    self.counter.drop_duplicates(subset='plate_number', keep='last', ignore_index=True, inplace=True)
+                                    # If plate detection confidence bigger than the threshold, show the detection
+                                    PLATE_DETECTION_CONF_THRESHOLD = 0.8
+                                    if max_plate_detection_conf >= PLATE_DETECTION_CONF_THRESHOLD:
+                                        plate_image = vehicle_image[y1:y2, x1:x2]
+                                        plate_image = upscale_image(img=plate_image, new_w=360)
+                                        
+                                        # Recognize the text of the plate number
+                                        plate_number = recognize_text(plate_image, text_recognition_model)
+                                        
+                                        # Count the vehicles
+                                        self.counter.loc[len(self.counter.index)] = [tracker_id, plate_number] 
+                                        self.counter.drop_duplicates(subset='tracker_id', keep='last', ignore_index=True, inplace=True)
+                                        self.counter.drop_duplicates(subset='plate_number', keep='last', ignore_index=True, inplace=True)
                     
                     draw_counter(img=frame, counter=self.counter, res=self.res)
                     cv2.polylines(img=frame, pts=[np.array(self.counter_area, dtype=int)], isClosed=True, color=(0, 0, 255), thickness=1)

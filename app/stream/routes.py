@@ -8,16 +8,16 @@ from .streaming import StreamingThread
 from .dependencies import streamings
 
 
-router = APIRouter()
+router = APIRouter(prefix='/streams')
 
-@router.get('/')
-def show(fps: int = 15):
-    return ", ".join(list(streamings.keys()))
+# @router.get('/')
+# def show(fps: int = 15):
+#     return ", ".join(list(streamings.keys()))
 
 
-@router.get('/streams/{name}/stream')
-def get_stream(name: str, fps: int = 15):
-    stream: StreamingThread = streamings.get(name)
+@router.get('/{camera_id}/stream')
+def get_stream(camera_id: str, fps: int = 15):
+    stream: StreamingThread = streamings.get(camera_id)
     if not stream:
         raise HTTPException(status_code=404, detail="Stream not found")
 
@@ -27,17 +27,14 @@ def get_stream(name: str, fps: int = 15):
         background=BackgroundTask(stream.stop_frame)
     )
 
-@router.get('/streams/{name}')
-def show(name: str, fps: int = 15):
+@router.get('/{camera_id}')
+def show_stream(camera_id: str, fps: int = 15):
     html = f"""
     <!DOCTYPE html>
     <html>
         <head><title>Streaming</title></head>
         <body>
-            <img width="1024" src="/streams/{name}/stream?fps={fps}" />
-            <form action="/vehicles" target="_blank" method="post">
-                <input type="submit" value="Data Monitoring">
-            </form>
+            <img width="1024" src="/streams/{camera_id}/stream?fps={fps}" />
         </body>
     </html>
     """

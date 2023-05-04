@@ -1,3 +1,4 @@
+import uuid
 from copy import copy
 from typing import List, Optional
 from app.camera.events import CameraCreated, CameraDeleted, CameraUpdated
@@ -9,7 +10,7 @@ from .model import Camera
 
 class CameraRepository:
     data = []
-    incrementor = 0
+    # incrementor = 0
     events: EventsEmitter
 
     def __init__(self, events_emitter) -> None:
@@ -25,7 +26,7 @@ class CameraRepository:
         return None
 
     def add(self, data: CreateCamera) -> Camera:
-        camera = Camera(self._generate_id(), data.name, data.source, data.res, data.loop, data.counter_line)
+        camera = Camera(self._generate_id(), data.source, data.res, data.loop, data.counter_line)
         self.data.append(camera)
         self.events.emit(CameraCreated(camera))
 
@@ -33,7 +34,7 @@ class CameraRepository:
 
     def edit(self, id: int, data: EditCamera) -> Camera:
         camera = self.find(id)
-        if data.name: camera.name = data.name
+        # if data.name: camera.name = data.name
         if data.source: camera.source = data.source            
         if data.res: camera.res = data.res
         if data.loop: camera.loop = data.loop
@@ -52,6 +53,7 @@ class CameraRepository:
 
 
     def _generate_id(self):
-        self.incrementor += 1
-        return self.incrementor
+        # self.incrementor += 1
+        # return self.incrementor
+        return str(uuid.uuid4())
     

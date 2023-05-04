@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, Union, List, Tuple
 
-from app.streams.streaming import StreamingThread
+from app.stream.streaming import StreamingThread
 from app.utils import get_counter_area
 
 
