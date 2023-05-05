@@ -26,7 +26,7 @@ def add_camera_with_uploaded_video(
     # name: str = Form(...),
     res: Optional[int] = Form(720),
     loop: Optional[bool] = Form(True),
-    counter_line_str: Optional[str] = Form('[[0,288], [720, 288]]'),
+    counter_line_str: Optional[str] = Form('[[0,280], [720, 280]]'),
     camera_repository: CameraRepository = Depends(get_camera_repository),
 ):
     try:
@@ -66,7 +66,7 @@ def get_cameras(camera_repository: CameraRepository = Depends(get_camera_reposit
 
 
 @router.get("/{id}")
-def get_camera(id: int, camera_repository: CameraRepository = Depends(get_camera_repository)):
+def get_camera(id: str, camera_repository: CameraRepository = Depends(get_camera_repository)):
     camera = camera_repository.find(id)
     return {
         "data": camera.dict(),
@@ -74,12 +74,12 @@ def get_camera(id: int, camera_repository: CameraRepository = Depends(get_camera
 
 
 @router.put("/{id}")
-def edit_camera(id: int, camera: EditCamera, camera_repository: CameraRepository = Depends(get_camera_repository)):
+def edit_camera(id: str, camera: EditCamera, camera_repository: CameraRepository = Depends(get_camera_repository)):
     camera = camera_repository.edit(id, camera)
     return {"data": camera.dict()}
 
 
 @router.delete("/{id}")
-def delete_camera(id: int, camera_repository: CameraRepository = Depends(get_camera_repository)):
+def delete_camera(id: str, camera_repository: CameraRepository = Depends(get_camera_repository)):
     camera_repository.delete(id)
     return JSONResponse(status_code=204)

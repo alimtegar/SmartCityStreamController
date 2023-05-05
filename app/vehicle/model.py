@@ -4,7 +4,8 @@ from sqlalchemy.sql.sqltypes import DateTime
 metadata = MetaData()
 
 vehicles = Table(
-    'vehicles', metadata,
+    'vehicles', 
+    metadata,
     Column('id', String(38), primary_key=True, index=True),
     Column('vehicleType', String(255)), #Enum('Car', 'Bus', 'Motorcycle', 'Truck')),
     Column('plateNumber', String(255), index=True),

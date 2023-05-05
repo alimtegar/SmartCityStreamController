@@ -9,7 +9,7 @@ from supervision import Detections
 
 
 from app.config import WANTED_CLASS_ID_LIST, CLASS_NAME_MAP
-from app.models import vehicle_detection_model, plate_detection_model, text_recognition_model
+# from app.models import vehicle_detection_model, plate_detection_model, text_recognition_model
 from app.utils import filter_detections, draw_counter, upscale_image, recognize_text, get_plate_city
 from app.tracker import Tracker
 from app.vehicle.schemas import VehicleSchema
@@ -17,7 +17,7 @@ from app.vehicle.dependencies import add_vehicle_to_db
 
 
 class StreamingThread(Thread):
-    def __init__(self, source, name, res, loop, counter_line, counter_area):
+    def __init__(self, source, name, res, loop, counter_line, counter_area, vehicle_detection_model, plate_detection_model, text_recognition_model):
         Thread.__init__(self)
         self.name = name
         self.source = source
@@ -25,6 +25,9 @@ class StreamingThread(Thread):
         self.loop = loop
         self.counter_line = counter_line
         self.counter_area = counter_area
+        self.vehicle_detection_model = vehicle_detection_model
+        self.plate_detection_model = plate_detection_model
+        self.text_recognition_model = text_recognition_model
 
         self.capture = None  # type: cv2.VideoCapture
         self.current_frame = None
@@ -76,8 +79,10 @@ class StreamingThread(Thread):
 
                     ## Assume here for Hard Processing
                     # Detect the vehicles on the frame
-                    results = vehicle_detection_model(frame)[0]
+                    results = self.vehicle_detection_model(frame)[0]
                     vehicle_detections = Detections.from_yolov8(results).with_nms()
+                    
+                    # print(f'detections on {self.name} = ', len(vehicle_detections))
                     
                     # Filter the detections from unwanted classes
                     mask = np.array([class_id in WANTED_CLASS_ID_LIST for class_id in vehicle_detections.class_id], dtype=bool)
@@ -103,7 +108,7 @@ class StreamingThread(Thread):
                             
                             if is_in_area and not tracker_id in self.counter['tracker_id'].values:
                                 # Detect the plate of the vehicle
-                                plate_detections = plate_detection_model.predict(vehicle_image)[0]
+                                plate_detections = self.plate_detection_model.predict(vehicle_image)[0]
 
                                 # Process the plate detection if any
                                 if (len(plate_detections) > 0):
@@ -121,16 +126,16 @@ class StreamingThread(Thread):
                                         plate_image = upscale_image(img=plate_image, new_w=360)
                                         
                                         # Recognize the text of the plate number
-                                        plate_number = recognize_text(plate_image, text_recognition_model)
+                                        plate_number = recognize_text(plate_image, self.text_recognition_model)
                                         
-                                        # Add vehicle to DB
-                                        vehicle = VehicleSchema(
-                                            timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                                            vehicleType=CLASS_NAME_MAP[class_id],
-                                            plateNumber=plate_number,
-                                            plateCity=get_plate_city(plate_number),
-                                        )
-                                        add_vehicle_to_db(vehicle)
+                            #             # Add vehicle to DB
+                            #             vehicle = VehicleSchema(
+                            #                 timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                            #                 vehicleType=CLASS_NAME_MAP[class_id],
+                            #                 plateNumber=plate_number,
+                            #                 plateCity=get_plate_city(plate_number),
+                            #             )
+                            #             add_vehicle_to_db(vehicle)
                                         
                                         # Count the vehicles
                                         self.counter.loc[len(self.counter.index)] = [tracker_id, plate_number] 

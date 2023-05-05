@@ -1,9 +1,9 @@
-import torch
+# import torch
 import torch.nn as nn
-from ultralytics import YOLO
+# from ultralytics import YOLO
 from torchvision.models import resnet18
 
-from app.config import VEHICLE_DETECTION_MODEL_PATH, PLATE_DETECTION_MODEL_PATH, TEXT_RECOGNITION_MODEL_PATH, VOCABULARY
+# from app.config import VEHICLE_DETECTION_MODEL_PATH, PLATE_DETECTION_MODEL_PATH, TEXT_RECOGNITION_MODEL_PATH, VOCABULARY
 
 resnet = resnet18(weights=None)
 
@@ -66,11 +66,11 @@ class CRNN(nn.Module):
 
     return x
 
-vehicle_detection_model = YOLO(VEHICLE_DETECTION_MODEL_PATH)
-vehicle_detection_model.fuse()
+# vehicle_detection_model = YOLO(VEHICLE_DETECTION_MODEL_PATH)
+# vehicle_detection_model.fuse()
 
-plate_detection_model = YOLO(PLATE_DETECTION_MODEL_PATH)
-plate_detection_model.fuse()
+# plate_detection_model = YOLO(PLATE_DETECTION_MODEL_PATH)
+# plate_detection_model.fuse()
 
-text_recognition_model = CRNN(num_chars=len(VOCABULARY))
-text_recognition_model.load_state_dict(torch.load(TEXT_RECOGNITION_MODEL_PATH, map_location=torch.device('cpu')))
+# text_recognition_model = CRNN(num_chars=len(VOCABULARY))
+# text_recognition_model.load_state_dict(torch.load(TEXT_RECOGNITION_MODEL_PATH, map_location=torch.device('cpu')))
