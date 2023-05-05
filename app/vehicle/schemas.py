@@ -7,7 +7,7 @@ class VehicleSchema(BaseModel):
     vehicleType: str
     plateNumber: str
     plateCity: str
-    stream_id: int
+    streamId: int
 
     class Config:
         orm_mode = True

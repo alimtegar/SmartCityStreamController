@@ -9,6 +9,6 @@ vehicles = Table(
     Column('vehicleType', String(255)), #Enum('Car', 'Bus', 'Motorcycle', 'Truck')),
     Column('plateNumber', String(255), index=True),
     Column('plateCity', String(255)),
-    Column('stream_id', Integer),
+    Column('streamId', Integer),
     Column('timestamp', DateTime()),
 )

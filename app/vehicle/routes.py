@@ -134,26 +134,26 @@ async def get_vehicles(response: Response, stream_id: Optional[int] = None,
         length = len(result_dict)
         response = {"message": f"success read data", "data": result_dict}
     
-    # return response if length !=0 else {"message": f"data not found"}
+    return response if length !=0 else {"message": f"data not found"}
 
-    html = f"""
-    <!DOCTYPE html>
-    <html>
-        <head><title>Data Monitoring</title></head>
-        <body>
-            <h2>{response_title}</h2
-            <h3>
-                <strong>{length}</strong> vehicles counted.
-            </h3>
-        </body>
-    </html>
-    """
-    return HTMLResponse(content=html, status_code=200) 
+    # html = f"""
+    # <!DOCTYPE html>
+    # <html>
+    #     <head><title>Data Monitoring</title></head>
+    #     <body>
+    #         <h2>{response_title}</h2
+    #         <h3>
+    #             <strong>{length}</strong> vehicles counted.
+    #         </h3>
+    #     </body>
+    # </html>
+    # """
+    # return HTMLResponse(content=html, status_code=200) 
 
 @router.get("/{id}", description="Get the detail of a single vehicle.")
-async def get_vehicle(id: int, response: Response):
+async def get_vehicle(id: str, response: Response):
     query = vehicles.select().where(vehicles.c.id == id)
-    data = conn.execute(query).fetchone(dict())
+    data = conn.execute(query).fetchone()
     if data is None:
         response.status_code = status.HTTP_404_NOT_FOUND
         return {"message": "data not found", "status": response.status_code}
