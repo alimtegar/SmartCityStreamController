@@ -109,11 +109,10 @@ class StreamingThread(Thread):
                             # cv2.putText(img=frame, text=f'#{tracker_id} ?{is_in_area}&{not is_counted}', org=(x1, y1), fontFace=1, fontScale=0.5, color=(255, 255, 255), thickness=1)
                             
                             if is_in_area and not is_counted:
-                                print('hjmr')
                                 # Detect the plate of the vehicle
                                 plate_detections = self.plate_detection_model.predict(vehicle_image)[0]
                                 plate_number = ''
-                                is_no_plate_number = 0.0
+                                is_no_plate_number = ''
 
                                 # Process the plate detection if any
                                 if (len(plate_detections) > 0):
@@ -133,10 +132,10 @@ class StreamingThread(Thread):
                                         # Recognize the text of the plate number
                                         plate_number = recognize_text(plate_image, self.text_recognition_model)
                                     else:
-                                        is_no_plate_number = str(uuid.uuid4)
+                                        is_no_plate_number = str(uuid.uuid4())
                                 else:
-                                    is_no_plate_number = str(uuid.uuid4)
-                                    
+                                    is_no_plate_number = str(uuid.uuid4())
+                                # print('plate_number = ', plate_number)
                                 # Add vehicle to DB
                                 vehicle = VehicleSchema(
                                     timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
