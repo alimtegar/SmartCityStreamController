@@ -44,7 +44,7 @@ class CRNN(nn.Module):
         bidirectional=True,
         batch_first=True
     )
-    self.linear2 = nn.Linear(self.rnn_hidden_size*2, num_chars)
+    self.linear2 = nn.Linear(self.rnn_hidden_size*2, 38)
     
   def forward(self, x):
     x = self.cnn_p1(x)

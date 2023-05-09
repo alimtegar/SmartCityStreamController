@@ -17,6 +17,7 @@ def add_vehicle_to_db(vehicle: VehicleSchema):
     # Insert the new vehicle record into the database
     query = vehicles.insert().values(**vehicle_dict)
     conn.execute(query)
+    conn.commit()  #For Windows OS
     
     return vehicle_dict
   except Exception as e:
