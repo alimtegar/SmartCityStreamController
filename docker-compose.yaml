@@ -1,0 +1,6 @@
+services:
+  smart-city:
+    container_name: smart-city
+    image: smart-city:1.0
+    ports:
+      - 8000:8000

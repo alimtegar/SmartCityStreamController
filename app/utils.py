@@ -109,7 +109,8 @@ def recognize_text(np_image: np.ndarray, model):
   return recognized_text
 
 def get_plate_city(plate_number: str):
-  plate_city_code = re.match(r'[A-Za-z]{1,2}', plate_number).group()
+  plate_city_code = re.match(r'[A-Za-z]{1,2}', plate_number)
+  plate_city_code = plate_city_code.group() if plate_city_code else ''
                                                  # Default value, if `plate_city_code` doesn't exist in `PLATE_CITY_MAP`
-  plate_city = PLATE_CITY_MAP.get(plate_city_code, plate_city_code)
+  plate_city = PLATE_CITY_MAP.get(plate_city_code, '')
   return plate_city
