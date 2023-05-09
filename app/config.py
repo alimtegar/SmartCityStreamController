@@ -84,7 +84,7 @@ PLATE_CITY_MAP = {
 
 # LINE_START = (540, 2110)
 # LINE_END = (3834, 1370)
-COUNTER_AREA_H = 25
+COUNTER_AREA_H = 6
 
 # Text Recognition Config
 VOCABULARY = [

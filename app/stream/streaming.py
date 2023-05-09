@@ -1,4 +1,5 @@
 from threading import Thread
+import uuid
 import numpy as np
 import time
 import cv2
@@ -9,7 +10,6 @@ from supervision import Detections
 
 
 from app.config import WANTED_CLASS_ID_LIST, CLASS_NAME_MAP
-# from app.models import vehicle_detection_model, plate_detection_model, text_recognition_model
 from app.utils import filter_detections, draw_counter, upscale_image, recognize_text, get_plate_city
 from app.tracker import Tracker
 from app.vehicle.schemas import VehicleSchema
@@ -37,7 +37,7 @@ class StreamingThread(Thread):
         self.should_flip = str(self.source).isnumeric()
         
         self.tracker = Tracker()
-        self.counter = pd.DataFrame(columns=['tracker_id', 'plate_number'])
+        self.counter = pd.DataFrame(columns=['tracker_id', 'plate_number', 'is_no_plate_number'])
 
     def reset(self):
         self.status = "need_restart"
@@ -98,6 +98,7 @@ class StreamingThread(Thread):
                             # Check if the vehicle is in `area1`
                             dot2area_dist = cv2.pointPolygonTest(np.array(self.counter_area, dtype=int), dot_xy, False)
                             is_in_area = dot2area_dist >= 0
+                            is_counted = tracker_id in self.counter['tracker_id'].values
                             
                             # Crop the frame with detected vehicle
                             vehicle_image = frame[y1:y2, x1:x2] #.copy()
@@ -105,10 +106,14 @@ class StreamingThread(Thread):
                             # Draw the bbox for the vehicle and draw a dot on the top-left of the bbox
                             cv2.rectangle(img=frame, pt1=(x1, y1), pt2=(x2, y2), color=(0, 255, 0), thickness=1)
                             cv2.circle(img=frame, center=dot_xy, radius=2, color=(255, 0, 255), thickness=-1)
+                            # cv2.putText(img=frame, text=f'#{tracker_id} ?{is_in_area}&{not is_counted}', org=(x1, y1), fontFace=1, fontScale=0.5, color=(255, 255, 255), thickness=1)
                             
-                            if is_in_area and not tracker_id in self.counter['tracker_id'].values:
+                            if is_in_area and not is_counted:
+                                print('hjmr')
                                 # Detect the plate of the vehicle
                                 plate_detections = self.plate_detection_model.predict(vehicle_image)[0]
+                                plate_number = ''
+                                is_no_plate_number = 0.0
 
                                 # Process the plate detection if any
                                 if (len(plate_detections) > 0):
@@ -117,33 +122,40 @@ class StreamingThread(Thread):
                                     max_plate_detection_xyxy = max_plate_detection_boxes.xyxy[0]
                                     max_plate_detection_conf = max_plate_detection_boxes.conf[0]
                                     
-                                    x1, y1, x2, y2 = map(int, max_plate_detection_xyxy[:4])
+                                    x1b, y1b, x2b, y2b = map(int, max_plate_detection_xyxy[:4])
 
                                     # If plate detection confidence bigger than the threshold, show the detection
                                     PLATE_DETECTION_CONF_THRESHOLD = 0.8
                                     if max_plate_detection_conf >= PLATE_DETECTION_CONF_THRESHOLD:
-                                        plate_image = vehicle_image[y1:y2, x1:x2]
+                                        plate_image = vehicle_image[y1b:y2b, x1b:x2b]
                                         plate_image = upscale_image(img=plate_image, new_w=360)
                                         
                                         # Recognize the text of the plate number
                                         plate_number = recognize_text(plate_image, self.text_recognition_model)
+                                    else:
+                                        is_no_plate_number = str(uuid.uuid4)
+                                else:
+                                    is_no_plate_number = str(uuid.uuid4)
+                                    
+                                # Add vehicle to DB
+                                vehicle = VehicleSchema(
+                                    timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                    vehicleType=CLASS_NAME_MAP[class_id],
+                                    plateNumber=plate_number,
+                                    plateCity=get_plate_city(plate_number) if plate_number else '',
+                                    streamId=self.name,
+                                )
+                                add_vehicle_to_db(vehicle)
                                         
-                            #             # Add vehicle to DB
-                            #             vehicle = VehicleSchema(
-                            #                 timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                            #                 vehicleType=CLASS_NAME_MAP[class_id],
-                            #                 plateNumber=plate_number,
-                            #                 plateCity=get_plate_city(plate_number),
-                            #             )
-                            #             add_vehicle_to_db(vehicle)
-                                        
-                                        # Count the vehicles
-                                        self.counter.loc[len(self.counter.index)] = [tracker_id, plate_number] 
-                                        self.counter.drop_duplicates(subset='tracker_id', keep='last', ignore_index=True, inplace=True)
-                                        self.counter.drop_duplicates(subset='plate_number', keep='last', ignore_index=True, inplace=True)
+                                # Count the vehicles
+                                self.counter.loc[len(self.counter.index)] = [tracker_id, plate_number, is_no_plate_number] 
+                                self.counter.drop_duplicates(subset='tracker_id', keep='last', ignore_index=True, inplace=True)
+                                self.counter.drop_duplicates(subset=['plate_number', 'is_no_plate_number'], keep='last', ignore_index=True, inplace=True)
                     
                     draw_counter(img=frame, counter=self.counter, res=self.res)
-                    cv2.polylines(img=frame, pts=[np.array(self.counter_area, dtype=int)], isClosed=True, color=(0, 0, 255), thickness=1)
+                    # cv2.polylines(img=frame, pts=[np.array(self.counter_area, dtype=int)], isClosed=True, color=(0, 0, 255), thickness=1)
+                    cv2.line(img=frame, pt1=self.counter_line[0], pt2=self.counter_line[1], color=(0, 0, 255), thickness=1)
+                    print('counter = ', self.counter)
                     
                     self.current_frame = cv2.imencode('.png', frame)[1].tobytes()
         finally:
