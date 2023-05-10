@@ -1,7 +1,12 @@
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 VEHICLE_DETECTION_MODEL_PATH = 'yolov8n.pt'
 PLATE_DETECTION_MODEL_PATH = './model_weights/plate_detection_model_nano.pt'
-TEXT_RECOGNITION_MODEL_PATH = './model_weights/text_recognition_model.pt'
-# VIDEO_PATH = 'vehicle-traffic-2.webm'
+TEXT_RECOGNITION_MODEL_PATH = './model_weights/text_recognition_model_v2.pt'
 
 # Class IDs of Interest
 WANTED_CLASS_ID_LIST = [
@@ -82,8 +87,6 @@ PLATE_CITY_MAP = {
     'PB': 'Papua Barat',
 }
 
-# LINE_START = (540, 2110)
-# LINE_END = (3834, 1370)
 COUNTER_AREA_H = 6
 
 # Text Recognition Config
@@ -99,9 +102,9 @@ CHAR2IDX = {v: k for k, v in IDX2CHAR.items()}
 # Database Config
 DB_DIALECT = 'mysql'
 DB_DRIVER = 'mysqlconnector'
-DB_USERNAME = 'root'
-DB_PASSWORD = 'root'
-DB_HOST = 'localhost'
-DB_PORT = 3306
-DB_NAME = 'smart_city'
-DB_SOCKET='/Applications/MAMP/tmp/mysql/mysql.sock'
+DB_USERNAME = os.getenv('DB_USERNAME') # 'root'
+DB_PASSWORD = os.getenv('DB_PASSWORD') # 'root'
+DB_HOST = os.getenv('DB_HOST') # 'localhost'
+DB_PORT = os.getenv('DB_PORT') #3306
+DB_NAME = os.getenv('DB_NAME') # 'smart_city'
+DB_SOCKET = os.getenv('DB_SOCKET') # '/Applications/MAMP/tmp/mysql/mysql.sock'
