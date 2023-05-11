@@ -12,23 +12,22 @@ services:
       - ./db:/docker-entrypoint-initdb.d
       - smart-city-volume:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: secret
-      # MYSQL_ALLOW_EMPTY_PASSWORD: yes
+      # MYSQL_ROOT_PASSWORD: secret
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
   app:
     build: .
     ports:
       - 8000:8000
-    depends_on:
-      - db
     networks:
       - smart-city-network
     environment:
       DB_USERNAME: root
-      DB_PASSWORD: secret
+      DB_PASSWORD: ""
       DB_HOST: db
       DB_PORT: 3306
       DB_NAME: smart_city
       DB_SOCKET: ""
+    restart: on-failure
 networks:
   smart-city-network:
     name: smart-city-network
