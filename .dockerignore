@@ -14,3 +14,6 @@ Dockerfile
 *.mkv
 *.webm
 *.mp4
+
+.env
+.env.example

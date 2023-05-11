@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 VEHICLE_DETECTION_MODEL_PATH = 'yolov8n.pt'
-PLATE_DETECTION_MODEL_PATH = './model_weights/plate_detection_model_nano.pt'
-TEXT_RECOGNITION_MODEL_PATH = './model_weights/text_recognition_model_v2.pt'
+PLATE_DETECTION_MODEL_PATH = './model_weights/plate_detection_model.pt'
+TEXT_RECOGNITION_MODEL_PATH = './model_weights/text_recognition_model.pt'
 
 # Class IDs of Interest
 WANTED_CLASS_ID_LIST = [
