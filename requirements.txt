@@ -1,31 +1,32 @@
-#anyio==3.5.0
-#asgiref==3.5.0
-#attrs==21.4.0
-#click==8.0.3
+# anyio==3.5.0
+# asgiref==3.5.0
+# attrs==21.4.0
+# click==8.0.3
+# h11==0.13.0
+# idna==3.3
+# iniconfig==1.1.1
+# packaging==21.3
+# pluggy==1.0.0
+# py==1.11.0
+# pydantic==1.9.0
+# pyparsing==3.0.7
+# pytest==7.0.1
+# setuptools==60.6.0
+# sniffio==1.2.0
+# starlette==0.25.0
+# tomli==2.0.1
+# typing_extensions==4.1.1
+# wheel==0.37.1
+
 fastapi==0.95.1
-#h11==0.13.0
-#idna==3.3
-#iniconfig==1.1.1
-numpy==1.24.3
-opencv-python==4.7.0.72
-#packaging==21.3
-#pluggy==1.0.0
-#py==1.11.0
-#pydantic==1.9.0
-#pyparsing==3.0.7
-#pytest==7.0.1
-#setuptools==60.6.0
-#sniffio==1.2.0
-#starlette==0.25.0
-#tomli==2.0.1
-#typing_extensions==4.1.1
 uvicorn==0.22.0
 sqlalchemy==2.0.12
-#wheel==0.37.1
-ultralytics==8.0.97
-##torch
-##torchvision
-supervision==0.6.0
-Pillow==9.5.0
 mysql-connector-python==8.0.33
+numpy==1.24.3
+opencv-python==4.7.0.72
+Pillow==9.5.0
+# torch
+# torchvision
+ultralytics==8.0.97
+supervision==0.6.0
 python-dotenv==1.0.0
