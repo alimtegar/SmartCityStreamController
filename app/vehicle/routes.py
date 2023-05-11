@@ -40,7 +40,7 @@ async def get_vehicles(response: Response, stream_id: Optional[int] = None,
 
             data = conn.execute(query)
 
-            result_dict = [dict(u) for u in data.fetchall()]
+            result_dict = [u._asdict() for u in data.fetchall()]
             length = len(result_dict)
             response = {"message": f"success filter data ", "count": length, "data": result_dict}
         
@@ -54,7 +54,7 @@ async def get_vehicles(response: Response, stream_id: Optional[int] = None,
                 response_title = 'Count by TYPE in each stream ID'
             data = conn.execute(query)
 
-            result_dict = [dict(u) for u in data.fetchall()]
+            result_dict = [u._asdict() for u in data.fetchall()]
             length = len(result_dict)
             response = {"message": f"success filter data ", "count": length, "data": result_dict}
         
@@ -63,7 +63,7 @@ async def get_vehicles(response: Response, stream_id: Optional[int] = None,
             query = vehicles.select().where(and_(vehicles.c.stream_id==stream_id, vehicles.c.plateCity.contains(city)))
             data = conn.execute(query)
 
-            result_dict = [dict(u) for u in data.fetchall()]
+            result_dict = [u._asdict() for u in data.fetchall()]
             length = len(result_dict)
             response_title = 'Count by CITY in each stream ID'
             response = {"message": f"success filter data ", "count": length, "data": result_dict}
@@ -72,7 +72,7 @@ async def get_vehicles(response: Response, stream_id: Optional[int] = None,
             query = vehicles.select().where(vehicles.c.stream_id==stream_id)
             data = conn.execute(query)
 
-            result_dict = [dict(u) for u in data.fetchall()]
+            result_dict = [u._asdict() for u in data.fetchall()]
             length = len(result_dict)
             response_title = 'Count by stream ID'
             response = {"message": f"success get data ", "count": length, "data": result_dict }
@@ -96,7 +96,7 @@ async def get_vehicles(response: Response, stream_id: Optional[int] = None,
 
         data = conn.execute(query)
 
-        result_dict = [dict(u) for u in data.fetchall()]
+        result_dict = [u._asdict() for u in data.fetchall()]
         length = len(result_dict)
         response = {"message": f"success filter data ", "count": length, "data": result_dict}
         
@@ -111,7 +111,7 @@ async def get_vehicles(response: Response, stream_id: Optional[int] = None,
         
         data = conn.execute(query)
 
-        result_dict = [dict(u) for u in data.fetchall()]
+        result_dict = [u._asdict() for u in data.fetchall()]
         length = len(result_dict)
         response = {"message": f"success filter data ", "count": length, "data": result_dict}
         
@@ -120,7 +120,7 @@ async def get_vehicles(response: Response, stream_id: Optional[int] = None,
         query = vehicles.select().where(vehicles.c.plateCity.contains(city))
         data = conn.execute(query)
 
-        result_dict = [dict(u) for u in data.fetchall()]
+        result_dict = [u._asdict() for u in data.fetchall()]
         length = len(result_dict)
         response_title = 'Count by CITY'
         response = {"message": f"success filter data ", "count": length, "data": result_dict}
@@ -130,7 +130,7 @@ async def get_vehicles(response: Response, stream_id: Optional[int] = None,
         data = conn.execute(query)
 
         response_title = 'Count All Vehicles'
-        result_dict = [dict(u) for u in data.fetchall()]
+        result_dict = [u._asdict() for u in data.fetchall()]
         length = len(result_dict)
         response = {"message": f"success read data", "data": result_dict}
     
