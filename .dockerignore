@@ -15,5 +15,6 @@ Dockerfile
 *.webm
 *.mp4
 
+.tmp
 .env
 .env.example
