@@ -9,6 +9,7 @@ services:
     networks:
       - smart-city-network    
     volumes:
+      - ./db:/docker-entrypoint-initdb.d
       - smart-city-volume:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: secret
@@ -26,7 +27,7 @@ services:
       DB_PASSWORD: secret
       DB_HOST: db
       DB_PORT: 3306
-      DB_NAME: mysql
+      DB_NAME: smart_city
       DB_SOCKET: ""
 networks:
   smart-city-network:
