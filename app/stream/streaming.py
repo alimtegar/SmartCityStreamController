@@ -91,7 +91,8 @@ class StreamingThread(Thread):
                     if len(vehicle_detections):
                         # Track the vehicles
                         vehicle_detections = self.tracker.update(vehicle_detections)
-                        for xyxy, confidence, class_id, tracker_id in vehicle_detections:
+                        
+                        for xyxy, mask, confidence, class_id, tracker_id in vehicle_detections:
                             x1, y1, x2, y2 = xyxy.astype(np.int32)
                             dot_xy = [int(x2), int(y2)]
 

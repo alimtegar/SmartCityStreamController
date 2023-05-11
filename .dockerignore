@@ -8,3 +8,12 @@ __pycache__/
 
 Dockerfile
 .DS_Store
+
+*.pt
+*.mpg
+*.mkv
+*.webm
+*.mp4
+
+.env
+.env.example

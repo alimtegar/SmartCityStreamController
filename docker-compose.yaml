@@ -1,6 +1,35 @@
+version: '3'
+
 services:
-  smart-city:
-    container_name: smart-city
-    image: smart-city:1.0
+  db:
+    container_name: db
+    image: mysql:latest
+    ports:
+      - 3306:3306
+    networks:
+      - smart-city-network    
+    volumes:
+      - smart-city-volume:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      # MYSQL_ALLOW_EMPTY_PASSWORD: yes
+  app:
+    build: .
     ports:
       - 8000:8000
+    depends_on:
+      - db
+    networks:
+      - smart-city-network
+    environment:
+      DB_USERNAME: root
+      DB_PASSWORD: secret
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: mysql
+      DB_SOCKET: ""
+networks:
+  smart-city-network:
+    name: smart-city-network
+volumes:
+  smart-city-volume:

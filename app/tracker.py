@@ -15,7 +15,7 @@ class Tracker:
     objects_bbs_ids = []
 
     # Get center point of new object
-    for xyxy, confidence, class_id, tracker_id in detections:
+    for xyxy, mask, confidence, class_id, tracker_id in detections:
       x, y, w, h = xyxy
       cx = (x + x + w) // 2
       cy = (y + y + h) // 2

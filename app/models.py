@@ -44,7 +44,7 @@ class CRNN(nn.Module):
         bidirectional=True,
         batch_first=True
     )
-    self.linear2 = nn.Linear(self.rnn_hidden_size*2, 38)
+    self.linear2 = nn.Linear(self.rnn_hidden_size*2, num_chars)
     
   def forward(self, x):
     x = self.cnn_p1(x)
@@ -65,12 +65,3 @@ class CRNN(nn.Module):
     x = x.permute(1,0,2)
 
     return x
-
-# vehicle_detection_model = YOLO(VEHICLE_DETECTION_MODEL_PATH)
-# vehicle_detection_model.fuse()
-
-# plate_detection_model = YOLO(PLATE_DETECTION_MODEL_PATH)
-# plate_detection_model.fuse()
-
-# text_recognition_model = CRNN(num_chars=len(VOCABULARY))
-# text_recognition_model.load_state_dict(torch.load(TEXT_RECOGNITION_MODEL_PATH, map_location=torch.device('cpu')))
