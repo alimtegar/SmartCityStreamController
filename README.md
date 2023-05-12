@@ -1,21 +1,24 @@
 # Smart City
 
-<!-- Camera Routes (`/camera`) are to manage camera data, -->
-<!-- while Streaming -->
-
 ## Requirements
 - Docker
+- Git (Optional, only if you want to clone this repository)
 
 ## How to Run
-1. To run the application, simply enter the following command in your terminal:
+1. Download this repository or clone it with Git:
+```
+git clone https://github.com/widya-robotics-ai-intern-2023/smart_city.git
+```
+1. Download the model weights [here](https://drive.google.com/drive/folders/1gVZqc17D76PemjNEqF6qz4VILmhFCFRJ?usp=share_link) and move it to the **./model_weights/** folder.
+2. To run the application, simply enter the following command in your terminal:
 ```
 docker-compose up
 ```
-2. Open API Docs (Swagger) by visiting to http://localhost:3000/docs
+1. To try the demo, open the API Docs (Swagger) by visiting to http://localhost:3000/docs.
 
 ## Demo
-1. First, open the API Docs (Swagger) by visiting to http://localhost:3000/docs
-2. Next, go to section **/camera/video (POST)** to upload the video that you want to stream and specify the parameters for the streamed video. You will need to include the following parameters in your request:
+1. Open the API Docs (Swagger) by visiting to http://localhost:3000/docs.
+2. Go to section **/camera/video (POST)** to upload the video that you want to stream and specify the parameters for the streamed video. You will need to include the following parameters in your request:
 
 - **video**: the video file you want to stream
 - **res**: the desired resolution for the video
@@ -34,25 +37,14 @@ If the request is successful, the response will be as follows:
     "counter_line": [
       [
         100,
-        300
+        400
       ],
       [
-        700,
-        300
+        720,
+        250
       ]
     ]
   }
 }
 ```
-3. Finally, use the **id** value to stream the video by visiting  http://localhost:3000/streams/{id}
-
-<!-- ### Docker
-1. Build image
-```
-docker build -t streaming .
-```
-
-1. Start container
-```
-docker run -p 3000:3000 streaming
-``` -->
+3. To stream the video, use the "id" value returned in the successful response from step 2 as part of the URL http://localhost:3000/streams/{id}.
