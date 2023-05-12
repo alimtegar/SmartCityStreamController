@@ -9,12 +9,12 @@
 ```
 git clone https://github.com/widya-robotics-ai-intern-2023/smart_city.git
 ```
-1. Download the model weights [here](https://drive.google.com/drive/folders/1gVZqc17D76PemjNEqF6qz4VILmhFCFRJ?usp=share_link) and move it to the **./model_weights/** folder.
-2. To run the application, simply enter the following command in your terminal:
+2. Download the model weights [here](https://drive.google.com/drive/folders/1gVZqc17D76PemjNEqF6qz4VILmhFCFRJ?usp=share_link) and move it to the **./model_weights/** folder.
+3. To run the application, simply enter the following command in your terminal:
 ```
 docker-compose up
 ```
-1. To try the demo, open the API Docs (Swagger) by visiting to http://localhost:8000/docs.
+4. To try the demo, open the API Docs (Swagger) by visiting to http://localhost:8000/docs.
 
 ## Demo
 1. Open the API Docs (Swagger) by visiting to http://localhost:8000/docs.
