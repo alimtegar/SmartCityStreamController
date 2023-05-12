@@ -14,10 +14,10 @@ git clone https://github.com/widya-robotics-ai-intern-2023/smart_city.git
 ```
 docker-compose up
 ```
-1. To try the demo, open the API Docs (Swagger) by visiting to http://localhost:3000/docs.
+1. To try the demo, open the API Docs (Swagger) by visiting to http://localhost:8000/docs.
 
 ## Demo
-1. Open the API Docs (Swagger) by visiting to http://localhost:3000/docs.
+1. Open the API Docs (Swagger) by visiting to http://localhost:8000/docs.
 2. Go to section **/camera/video (POST)** to upload the video that you want to stream and specify the parameters for the streamed video. You will need to include the following parameters in your request:
 
 - **video**: the video file you want to stream
@@ -47,4 +47,4 @@ If the request is successful, the response will be as follows:
   }
 }
 ```
-3. To stream the video, use the "id" value returned in the successful response from step 2 as part of the URL http://localhost:3000/streams/{id}.
+3. To stream the video, use the **id** value returned in the successful response from step 2 as part of the URL http://localhost:8000/streams/{id}.
