@@ -3,11 +3,11 @@ import torch
 from typing import Dict, Union, List, Tuple
 from ultralytics import YOLO
 
-from app.config import VEHICLE_DETECTION_MODEL_PATH, PLATE_DETECTION_MODEL_PATH, TEXT_RECOGNITION_MODEL_PATH, VOCABULARY
-from app.models import CRNN
+from app.config import VEHICLE_DETECTION_MODEL_PATH, PLATE_DETECTION_MODEL_PATH, TEXT_RECOGNITION_MODEL_PATH, TEXT_RECOGNITION_CHARSET_TEST, DEVICE
+# from app.models import CRNN
 from app.stream.streaming import StreamingThread
 from app.utils import get_counter_area
-
+from app.strhub.models.utils import load_from_checkpoint
 
 log = logging.getLogger(__name__)
 streamings: Dict[str, StreamingThread] = dict()
@@ -26,9 +26,10 @@ def add_stream(name: str, source: Union[int, str], res: int, loop: bool, counter
     plate_detection_model = YOLO(PLATE_DETECTION_MODEL_PATH)
     plate_detection_model.fuse()
     
-    # Initialize and load the CRNN model for text recognition
-    text_recognition_model = CRNN(num_chars=len(VOCABULARY))
-    text_recognition_model.load_state_dict(torch.load(TEXT_RECOGNITION_MODEL_PATH, map_location=torch.device('cpu')))
+    # Initialize and load the model for text recognition
+    # text_recognition_model = CRNN(num_chars=len(VOCABULARY))
+    # text_recognition_model.load_state_dict(torch.load(TEXT_RECOGNITION_MODEL_PATH, map_location=torch.device('cpu')))
+    text_recognition_model = load_from_checkpoint(TEXT_RECOGNITION_MODEL_PATH, charset_test=TEXT_RECOGNITION_CHARSET_TEST).eval().to(DEVICE)
     
     thread = StreamingThread(
         source, 
