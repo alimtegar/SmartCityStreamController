@@ -10,7 +10,7 @@ from supervision import Detections
 
 
 from app.config import WANTED_CLASS_ID_LIST, CLASS_NAME_MAP
-from app.utils import filter_detections, draw_counter, upscale_image, recognize_text, get_plate_city
+from app.utils import filter_detections, draw_counter, upscale_image, read, get_plate_city
 from app.tracker import Tracker
 from app.vehicle.schemas import VehicleSchema
 from app.vehicle.dependencies import add_vehicle_to_db
@@ -131,7 +131,8 @@ class StreamingThread(Thread):
                                         plate_image = upscale_image(img=plate_image, new_w=360)
                                         
                                         # Recognize the text of the plate number
-                                        plate_number = recognize_text(plate_image, self.text_recognition_model)
+                                        # plate_number = recognize_text(plate_image, self.text_recognition_model)
+                                        plate_number = read(plate_image, self.text_recognition_model)
                                     else:
                                         is_no_plate_number = str(uuid.uuid4())
                                 else:
@@ -155,7 +156,7 @@ class StreamingThread(Thread):
                     draw_counter(img=frame, counter=self.counter, res=self.res)
                     # cv2.polylines(img=frame, pts=[np.array(self.counter_area, dtype=int)], isClosed=True, color=(0, 0, 255), thickness=1)
                     cv2.line(img=frame, pt1=self.counter_line[0], pt2=self.counter_line[1], color=(0, 0, 255), thickness=1)
-                    print('counter = ', self.counter)
+                    # print('counter = ', self.counter)
                     
                     self.current_frame = cv2.imencode('.png', frame)[1].tobytes()
         finally:

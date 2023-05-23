@@ -7,7 +7,8 @@ from PIL import Image
 from supervision import Detections
 from torchvision import transforms
 
-from app.config import IDX2CHAR, COUNTER_AREA_H, PLATE_CITY_MAP
+from app.config import COUNTER_AREA_H, PLATE_CITY_MAP, DEVICE
+from app.strhub.data.module import SceneTextDataModule
 
 def filter_detections(detections: Detections, mask: np.ndarray) -> Detections:
   return Detections(
@@ -63,50 +64,50 @@ def get_counter_area(counter_line):
   ]
 
 # Text Recognition Utils
-def decode_text(labels):
-  tokens = F.softmax(labels, 2).argmax(2)
-  tokens = tokens.numpy().T
-  plates = []
-  for token in tokens:
-      chars = [IDX2CHAR[idx] for idx in token]
-      plate = ''.join(chars)
-      plates.append(plate)
-  return plates
+# def decode_text(labels):
+#   tokens = F.softmax(labels, 2).argmax(2)
+#   tokens = tokens.numpy().T
+#   plates = []
+#   for token in tokens:
+#       chars = [IDX2CHAR[idx] for idx in token]
+#       plate = ''.join(chars)
+#       plates.append(plate)
+#   return plates
 
-def remove_duplicates(text):
-  if len(text) > 1:
-    letters = [text[0]] + [letter for idx, letter in enumerate(text[1:], start=1) if text[idx] != text[idx-1]]
-  elif len(text) == 1:
-    letters = [text[0]]
-  else:
-    return ''
-  return ''.join(letters)
+# def remove_duplicates(text):
+#   if len(text) > 1:
+#     letters = [text[0]] + [letter for idx, letter in enumerate(text[1:], start=1) if text[idx] != text[idx-1]]
+#   elif len(text) == 1:
+#     letters = [text[0]]
+#   else:
+#     return ''
+#   return ''.join(letters)
 
-def correct_text(word):
-  parts = word.split('-')
-  parts = [remove_duplicates(part) for part in parts]
-  corrected_text = ''.join(parts)
-  return corrected_text
+# def correct_text(word):
+#   parts = word.split('-')
+#   parts = [remove_duplicates(part) for part in parts]
+#   corrected_text = ''.join(parts)
+#   return corrected_text
 
-def recognize_text(np_image: np.ndarray, model):
-  pil_image = Image.fromarray(np_image).convert('RGB')
+# def recognize_text(np_image: np.ndarray, model):
+#   pil_image = Image.fromarray(np_image).convert('RGB')
 
-  # Preprocess the image
-  transform = transforms.Compose([
-      transforms.Resize((256, 256)),
-      transforms.ToTensor(),
-      transforms.Normalize((0.5,), (0.5,))
-  ])
-  image = transform(pil_image)
-  image = image.unsqueeze(0)
+#   # Preprocess the image
+#   transform = transforms.Compose([
+#       transforms.Resize((256, 256)),
+#       transforms.ToTensor(),
+#       transforms.Normalize((0.5,), (0.5,))
+#   ])
+#   image = transform(pil_image)
+#   image = image.unsqueeze(0)
 
-  # Perform inference
-  with torch.no_grad():
-    output = model(image)
-    recognized_text = decode_text(output)
-    recognized_text = correct_text(recognized_text[0])
+#   # Perform inference
+#   with torch.no_grad():
+#     output = model(image)
+#     recognized_text = decode_text(output)
+#     recognized_text = correct_text(recognized_text[0])
 
-  return recognized_text
+#   return recognized_text
 
 def get_plate_city(plate_number: str):
   plate_city_code = re.match(r'[A-Za-z]{1,2}', plate_number)
@@ -114,3 +115,20 @@ def get_plate_city(plate_number: str):
                                                  # Default value, if `plate_city_code` doesn't exist in `PLATE_CITY_MAP`
   plate_city = PLATE_CITY_MAP.get(plate_city_code, '')
   return plate_city
+
+
+# Text Recognition Utils (PARSeq)
+import torchvision
+def read(np_image: np.ndarray, model):
+  img_transform = SceneTextDataModule.get_transform(model.hparams.img_size)
+
+  image = Image.fromarray(np_image).convert('RGB')
+  transformed_image = img_transform(image).unsqueeze(0).to(DEVICE)
+
+  p = model(transformed_image).softmax(-1)
+  pred, p = model.tokenizer.decode(p)
+  
+  image.save(f'{pred[0]}_original.jpg')
+  torchvision.utils.save_image(transformed_image, f'{pred[0]}_transformed.jpg')
+  
+  return pred[0]

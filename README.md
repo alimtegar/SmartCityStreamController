@@ -33,16 +33,16 @@ If the request is successful, the response will be as follows:
   "data": {
     "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
     "source": "./uploads/videos/video-1234567890.mp4",
-    "res": 720,
+    "res": 1280,
     "loop": true,
     "counter_line": [
       [
         100,
-        400
+        720
       ],
       [
-        720,
-        250
+        1280,
+        400
       ]
     ]
   }
