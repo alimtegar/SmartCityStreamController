@@ -1,10 +1,10 @@
 # Smart City
 
 ## Requirements
-- Docker
-- Git (Optional, only if you want to clone this repository)
+- [Docker](https://www.docker.com/products/docker-desktop/)
+- [Git](https://git-scm.com/downloads) (Optional, only if you want to clone this repository)
+## How to Install
 
-## How to Run
 1. Download this repository or clone it with Git:
 ```
 git clone https://github.com/widya-robotics-ai-intern-2023/smart_city.git
@@ -17,7 +17,10 @@ docker-compose up
 ```
 5. To try the demo, open the API Docs (Swagger) by visiting to http://localhost:8000/docs.
 
-## Demo
+## How to Run (with Webcam)
+Coming soon...
+
+## How to Run (with Video File)
 1. Open the API Docs (Swagger) by visiting to http://localhost:8000/docs.
 2. Go to section **/camera/video (POST)** to upload the video that you want to stream and specify the parameters for the streamed video. You will need to include the following parameters in your request:
 
