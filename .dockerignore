@@ -9,7 +9,6 @@ __pycache__/
 Dockerfile
 .DS_Store
 
-*.pt
 *.mpg
 *.mkv
 *.webm
@@ -18,3 +17,7 @@ Dockerfile
 .tmp
 .env
 .env.example
+.dockerignore
+.docker-compose.yaml
+poetry.lock
+README.md
