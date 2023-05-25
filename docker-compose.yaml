@@ -18,6 +18,8 @@ services:
     build: .
     ports:
       - 8000:8000
+    # devices:
+    #   - /dev/video0:/dev/video0
     networks:
       - smart-city-network
     environment:
