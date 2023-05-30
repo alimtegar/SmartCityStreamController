@@ -12,11 +12,6 @@ git clone https://github.com/widya-robotics-ai-intern-2023/smart_city.git
 ```
 2. Open the repository folder.
 3. Download the model weights [here](https://drive.google.com/drive/folders/1gVZqc17D76PemjNEqF6qz4VILmhFCFRJ?usp=share_link) and move them to the **./model_weights/** folder.
-<!-- 4. To run the application, simply enter the following command in your terminal:
-```
-docker-compose up
-```
-5. To try the demo, open the API Docs (Swagger) by visiting to http://localhost:8000/docs. -->
 
 ## How to Stream Video (with Webcam)
 <details>
@@ -27,8 +22,8 @@ docker-compose up
 ```
 docker-compose up
 ```
-1. Open the API Docs (Swagger UI) by visiting to http://localhost:8000/docs.
-2. To add the webcam for video streaming, go to section **/camera (POST)** and send a request with the following parameters:
+2. Open the API Docs (Swagger UI) by visiting to http://localhost:8000/docs.
+3. To add the webcam for video streaming, go to section **/camera (POST)** and send a request with the following parameters:
 - **source**: the source of the webcam
 - **res**: the desired resolution for the video
 - **counter_line**: an array of coordinate pairs to specify a counter line in the video
@@ -70,8 +65,8 @@ Upon a successful request, the response will be as follows:
 pip install -r requirements.txt
 uvicorn app.main:app
 ```
-1. Open the API Docs (Swagger UI) by visiting to http://localhost:8000/docs.
-2. To add the webcam for video streaming, go to section **/camera (POST)** and send a request with the following parameters:
+4. Open the API Docs (Swagger UI) by visiting to http://localhost:8000/docs.
+5. To add the webcam for video streaming, go to section **/camera (POST)** and send a request with the following parameters:
 - **source**: the source of the webcam
 - **res**: the desired resolution for the video
 - **counter_line**: an array of coordinate pairs to specify a counter line in the video
@@ -98,7 +93,7 @@ Upon a successful request, the response will be as follows:
   }
 }
 ```
-5. To stream the video, use the **id** value returned in the successful response from step 4 as part of the URL: http://localhost:8000/streams/{id}.
+6. To stream the video, use the **id** value returned in the successful response from step 5 as part of the URL: http://localhost:8000/streams/{id}.
 </details>
 
 ## How to Stream Video (with Video File)
