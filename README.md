@@ -23,12 +23,12 @@ docker-compose up
 <summary>Linux</summary>
 
 ### Linux
-1. First, open the terminal and change the directory to the application folder. Then, run the application by simply entering this command:
+1. First, open the terminal and change the directory to the application folder. Then, run the application by entering following command:
 ```
 docker-compose up
 ```
-2. Open the API Docs (Swagger UI) by visiting to http://localhost:8000/docs.
-3. To add the webcam for video streaming, go to section **/camera (POST)** and send a request with the following parameters:
+1. Open the API Docs (Swagger UI) by visiting to http://localhost:8000/docs.
+2. To add the webcam for video streaming, go to section **/camera (POST)** and send a request with the following parameters:
 - **source**: the source of the webcam
 - **res**: the desired resolution for the video
 - **counter_line**: an array of coordinate pairs to specify a counter line in the video
@@ -59,21 +59,60 @@ Upon a successful request, the response will be as follows:
 
 </details>
 <details>
-  <summary>Windows and macOS</summary>
+<summary>Windows and macOS</summary>
 
-  Coming soon...
+### Windows and macOS
+
+1. First, start your MySQL server.
+2. Create the **.env** file by copying the **.env.example** file and renaming it to **.env**. Provide the required information about your MySQL server in the **.env** file. This step will enable the application to establish a connection with the MySQL server.
+3. Open the terminal and change the directory to the application folder. Then, run the application by simply entering following commands:
+```
+pip install -r requirements.txt
+uvicorn app.main:app
+```
+1. Open the API Docs (Swagger UI) by visiting to http://localhost:8000/docs.
+2. To add the webcam for video streaming, go to section **/camera (POST)** and send a request with the following parameters:
+- **source**: the source of the webcam
+- **res**: the desired resolution for the video
+- **counter_line**: an array of coordinate pairs to specify a counter line in the video
+
+Upon a successful request, the response will be as follows:
+
+```
+{
+  "data": {
+    "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "source": 0,
+    "res": 1280,
+    "loop": true,
+    "counter_line": [
+      [
+        100,
+        720
+      ],
+      [
+        1280,
+        400
+      ]
+    ]
+  }
+}
+```
+5. To stream the video, use the **id** value returned in the successful response from step 4 as part of the URL: http://localhost:8000/streams/{id}.
 </details>
 
 ## How to Stream Video (with Video File)
 <details>
 <summary>All OS</summary>
 
-1. First, open the terminal and change the directory to the application folder. Then, run the application by simply entering this command:
+### All OS
+
+1. First, open the terminal and change the directory to the application folder. Then, run the application by entering following command:
 ```
 docker-compose up
 ```
-2. Open the API Docs (Swagger) by visiting to http://localhost:8000/docs.
-3. To upload the video that you want to stream, go to section **/camera/video (POST)**  and send a request with following parameters:
+1. Open the API Docs (Swagger) by visiting to http://localhost:8000/docs.
+2. To upload the video that you want to stream, go to section **/camera/video (POST)**  and send a request with following parameters:
 
 - **video**: the video file that you want to stream
 - **res**: the desired resolution for the video
