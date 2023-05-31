@@ -77,7 +77,7 @@ def check_camera(camera_repository, id):
     # Check if camera exists
     if not camera_repository.find(id):
         # Camera not found, raise HTTPException with 404 status code
-        raise HTTPException(status_code=404, detail="Camera not found.")
+        raise HTTPException(status_code=404, detail=f"Camera with {id} not found.")
 
 
 @router.put("/{id}")
@@ -94,5 +94,5 @@ def delete_camera(id: str, camera_repository: CameraRepository = Depends(get_cam
     check_camera(camera_repository, id)
     camera_repository.delete(id)
     return {
-        "detail": f"Camera has been successfully deleted.",
+        "detail": f"Camera with {id} has been successfully deleted.",
     }
