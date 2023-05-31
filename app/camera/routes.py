@@ -76,10 +76,14 @@ def get_camera(id: str, camera_repository: CameraRepository = Depends(get_camera
 @router.put("/{id}")
 def edit_camera(id: str, camera: EditCamera, camera_repository: CameraRepository = Depends(get_camera_repository)):
     camera = camera_repository.edit(id, camera)
-    return {"data": camera.dict()}
+    return {
+        "data": camera.dict()
+    }
 
 
 @router.delete("/{id}")
 def delete_camera(id: str, camera_repository: CameraRepository = Depends(get_camera_repository)):
     camera_repository.delete(id)
-    return JSONResponse(status_code=204)
+    return {
+        "message": f"The camera with ID {id} has been successfully deleted.",
+    }

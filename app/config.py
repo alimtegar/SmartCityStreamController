@@ -1,4 +1,5 @@
 import os
+import torch
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -98,7 +99,7 @@ COUNTER_AREA_H = 6
 # CHAR2IDX = {v: k for k, v in IDX2CHAR.items()}
 
 TEXT_RECOGNITION_CHARSET_TEST = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-DEVICE = 'cpu'
+DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 # Database Config
 DB_DIALECT = 'mysql'
