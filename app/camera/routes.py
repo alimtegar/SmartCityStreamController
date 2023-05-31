@@ -73,13 +73,26 @@ def get_camera(id: str, camera_repository: CameraRepository = Depends(get_camera
     }
 
 
+def check_camera(camera_repository, id):
+    # Check if camera exists
+    if not camera_repository.find(id):
+        # Camera not found, raise HTTPException with 404 status code
+        raise HTTPException(status_code=404, detail="Camera not found.")
+
+
 @router.put("/{id}")
 def edit_camera(id: str, camera: EditCamera, camera_repository: CameraRepository = Depends(get_camera_repository)):
+    check_camera(camera_repository, id)
     camera = camera_repository.edit(id, camera)
-    return {"data": camera.dict()}
+    return {
+        "data": camera.dict()
+    }
 
 
 @router.delete("/{id}")
 def delete_camera(id: str, camera_repository: CameraRepository = Depends(get_camera_repository)):
+    check_camera(camera_repository, id)
     camera_repository.delete(id)
-    return JSONResponse(status_code=204)
+    return {
+        "detail": f"Camera has been successfully deleted.",
+    }

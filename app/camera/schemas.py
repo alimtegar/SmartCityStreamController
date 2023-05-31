@@ -14,7 +14,7 @@ class EditCamera(BaseModel):
     source: Optional[Union[int, str]] = None
     res: Optional[int] = None
     loop: Optional[bool] = None
-    counter_line: Optional[List[Tuple[int, int]]] = [(0,0), (0, 0)]
+    counter_line: Optional[List[Tuple[int, int]]] = None
 
 
 class CameraResponse(BaseModel):

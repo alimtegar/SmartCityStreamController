@@ -35,16 +35,16 @@ Upon a successful request, the response will be as follows:
   "data": {
     "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
     "source": 0,
-    "res": 1280,
+    "res": 720,
     "loop": true,
     "counter_line": [
       [
-        100,
-        720
+        0,
+        300
       ],
       [
-        1280,
-        400
+        720,
+        300
       ]
     ]
   }
@@ -62,7 +62,7 @@ Upon a successful request, the response will be as follows:
 2. Create the **.env** file by copying the **.env.example** file and renaming it to **.env**. Provide the required information about your MySQL server in the **.env** file. This step will enable the application to establish a connection with the MySQL server.
 3. Open the terminal and change the directory to the application folder. Then, run the application by simply entering following commands:
 ```
-pip install -r requirements.txt
+pip install -r requirements.txt torch torchvision
 uvicorn app.main:app
 ```
 4. Open the API Docs (Swagger UI) by visiting to http://localhost:8000/docs.
@@ -78,16 +78,16 @@ Upon a successful request, the response will be as follows:
   "data": {
     "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
     "source": 0,
-    "res": 1280,
+    "res": 720,
     "loop": true,
     "counter_line": [
       [
-        100,
-        720
+        0,
+        300
       ],
       [
-        1280,
-        400
+        720,
+        300
       ]
     ]
   }
@@ -121,16 +121,16 @@ Upon a successful request, the response will be as follows:
   "data": {
     "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
     "source": "./uploads/videos/video-1234567890.mp4",
-    "res": 1280,
+    "res": 720,
     "loop": true,
     "counter_line": [
       [
-        100,
-        720
+        0,
+        300
       ],
       [
-        1280,
-        400
+        720,
+        300
       ]
     ]
   }
