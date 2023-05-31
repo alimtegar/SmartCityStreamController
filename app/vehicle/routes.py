@@ -42,7 +42,7 @@ async def get_vehicles(response: Response, stream_id: Optional[int] = None,
 
             result_dict = [u._asdict() for u in data.fetchall()]
             length = len(result_dict)
-            response = {"message": f"success filter data ", "count": length, "data": result_dict}
+            response = {"message": f"Vehicles have been successfully filtered.", "count": length, "data": result_dict}
         
         # Filter Data by Type and type & city each Stream ID
         elif type is not None:
@@ -56,7 +56,7 @@ async def get_vehicles(response: Response, stream_id: Optional[int] = None,
 
             result_dict = [u._asdict() for u in data.fetchall()]
             length = len(result_dict)
-            response = {"message": f"success filter data ", "count": length, "data": result_dict}
+            response = {"message": f"Vehicles have been successfully filtered.", "count": length, "data": result_dict}
         
         # Filter Data by City each Stream ID
         elif city is not None:
@@ -66,7 +66,7 @@ async def get_vehicles(response: Response, stream_id: Optional[int] = None,
             result_dict = [u._asdict() for u in data.fetchall()]
             length = len(result_dict)
             response_title = 'Count by CITY in each stream ID'
-            response = {"message": f"success filter data ", "count": length, "data": result_dict}
+            response = {"message": f"Vehicles have been successfully filtered.", "count": length, "data": result_dict}
         
         else:
             query = vehicles.select().where(vehicles.c.stream_id==stream_id)
@@ -98,7 +98,7 @@ async def get_vehicles(response: Response, stream_id: Optional[int] = None,
 
         result_dict = [u._asdict() for u in data.fetchall()]
         length = len(result_dict)
-        response = {"message": f"success filter data ", "count": length, "data": result_dict}
+        response = {"message": f"Vehicles have been successfully filtered.", "count": length, "data": result_dict}
         
     # Filter Data by Type
     elif type is not None:
@@ -113,7 +113,7 @@ async def get_vehicles(response: Response, stream_id: Optional[int] = None,
 
         result_dict = [u._asdict() for u in data.fetchall()]
         length = len(result_dict)
-        response = {"message": f"success filter data ", "count": length, "data": result_dict}
+        response = {"message": f"Vehicles have been successfully filtered.", "count": length, "data": result_dict}
         
     # Filter Data by City
     elif city is not None:
@@ -123,7 +123,7 @@ async def get_vehicles(response: Response, stream_id: Optional[int] = None,
         result_dict = [u._asdict() for u in data.fetchall()]
         length = len(result_dict)
         response_title = 'Count by CITY'
-        response = {"message": f"success filter data ", "count": length, "data": result_dict}
+        response = {"message": f"Vehicles have been successfully filtered.", "count": length, "data": result_dict}
 
     else:
         query = vehicles.select().offset(0).limit(10)
@@ -132,9 +132,9 @@ async def get_vehicles(response: Response, stream_id: Optional[int] = None,
         response_title = 'Count All Vehicles'
         result_dict = [u._asdict() for u in data.fetchall()]
         length = len(result_dict)
-        response = {"message": f"success read data", "data": result_dict}
+        response = {"message": f"Vehicles have been successfully retrieved.", "data": result_dict}
     
-    return response if length !=0 else {"message": f"data not found"}
+    return response if length !=0 else {"message": f"Vehicles not found"}
 
     # html = f"""
     # <!DOCTYPE html>
@@ -154,11 +154,12 @@ async def get_vehicles(response: Response, stream_id: Optional[int] = None,
 async def get_vehicle(id: str, response: Response):
     query = vehicles.select().where(vehicles.c.id == id)
     data = conn.execute(query).fetchone()
+    print('data = ', data)
     if data is None:
         response.status_code = status.HTTP_404_NOT_FOUND
-        return {"message": "data not found", "status": response.status_code}
+        return {"message": f"Vehicle with ID {id} not found.", "status": response.status_code}
 
-    response = {"message": f"success fetching data by id {id}", "data": data }
+    response = {"message": f"Vehicle with ID {id} has been successfully retrieved.", "data": data._asdict() }
     return response
 
 @router.post('/', description="Add new vehicle.")
@@ -166,7 +167,7 @@ async def add_vehicle(vehicle : VehicleSchema):
     try:
         vehicle_dict = add_vehicle_to_db(vehicle)
         response = {
-            'message': 'Vehicle added successfully.', 
+            'message': 'Vehicle has been successfully added.', 
             'data': vehicle_dict
         }
     except Exception as e:

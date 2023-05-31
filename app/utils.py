@@ -118,7 +118,7 @@ def get_plate_city(plate_number: str):
 
 
 # Text Recognition Utils (PARSeq)
-import torchvision
+# import torchvision
 def read(np_image: np.ndarray, model):
   img_transform = SceneTextDataModule.get_transform(model.hparams.img_size)
 
@@ -128,7 +128,7 @@ def read(np_image: np.ndarray, model):
   p = model(transformed_image).softmax(-1)
   pred, p = model.tokenizer.decode(p)
   
-  image.save(f'{pred[0]}_original.jpg')
-  torchvision.utils.save_image(transformed_image, f'{pred[0]}_transformed.jpg')
+  # image.save(f'{pred[0]}_original.jpg')
+  # torchvision.utils.save_image(transformed_image, f'{pred[0]}_transformed.jpg')
   
   return pred[0]
